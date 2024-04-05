@@ -1,5 +1,8 @@
 """EFD client."""
 
+import datetime
+import logging
+import re
 from enum import Enum
 from functools import partial
 from typing import Any
@@ -12,9 +15,22 @@ import pandas as pd
 import requests
 from astropy.time import Time, TimeDelta
 from kafkit.registry.aiohttp import RegistryApi
+from lsst.utils.iteration import ensure_iterable
 
 from .auth_helper import NotebookAuth
-from .efd_utils import SyncSchemaParser, merge_packed_time_series
+from .efd_utils import (
+    SyncSchemaParser,
+    efd_timestamp_to_astropy,
+    get_begin_end,
+    get_day_obs_start_time,
+    merge_packed_time_series,
+)
+
+# When looking backwards in time to find the most recent state event, look back
+# in chunks of this size. Too small, and there will be too many queries, too
+# large and there will be too much data returned unnecessarily, as we only need
+# one row by definition. Will tune this parameters in consultation with SQuaRE.
+TIME_CHUNKING = datetime.timedelta(minutes=15)
 
 
 class ClientMode(Enum):
@@ -31,7 +47,7 @@ class _EfdClientStatic:
     This should be used to execute queries not wrapped by this class.
     """
 
-    subclasses = {}
+    subclasses = {}  # type: ignore
     deployment = ""
 
     @classmethod
@@ -400,6 +416,67 @@ class EfdClientTools:
             query_result = query_result.set_index(times.utc.datetime)
         return query_result
 
+    @staticmethod
+    def filter_topics(topics, to_find, case_sensitive=False):
+        """Return all the strings in topics which match
+        the query string.
+
+        Supports wildcards, which are denoted as `*``, as per shell globs.
+
+        Example:
+        >>> # assume topics are ['apple', 'banana', 'grape']
+        >>> getTopics(, 'a*p*')
+        ['apple', 'grape']
+
+        Parameters
+        ----------
+        to_find : `str`, optional
+            The query string, with optional wildcards denoted as *.
+        case_sensitive : `bool`, optional
+            If ``True``, the query is case sensitive. Defaults to ``False``.
+
+        Returns
+        -------
+        matches : `list` of `str`
+            The list of matching topics.
+        """
+        # Replace wildcard with regex equivalent
+        pattern = to_find.replace("*", ".*")
+        flags = re.IGNORECASE if not case_sensitive else 0
+
+        matches = []
+        for topic in topics:
+            if re.match(pattern, topic, flags):
+                matches.append(topic)
+        return matches
+
+    @staticmethod
+    def get_command_times(data, command, time_format="pandas"):
+        # Helper function to get the command times
+        command_times = {}  # type: ignore
+        for time, _ in data.iterrows():
+            # this is much the most simple data structure, and the chance
+            # of commands being *exactly* simultaneous is minimal so try
+            # it like this, and just raise if we get collisions for now. So
+            # far in testing this seems to be just fine.
+
+            time_key = None
+            match time_format:
+                case "pandas":
+                    time_key = time
+                case "astropy":
+                    time_key = Time(time)
+                case "python":
+                    time_key = time.to_pydatetime()
+
+            if time_key in command_times:
+                raise ValueError(
+                    f"There is already a command at {time_key=} -"
+                    " make a better data structure!"
+                )
+            command_times[time_key] = command
+        return command_times
+
 
 class EfdClientSync(_EfdClientStatic):
     """Class to handle connections and basic queries synchronously
@@ -467,7 +544,7 @@ class EfdClientSync(_EfdClientStatic):
             result, convert_influx_index=convert_influx_index
         )
 
-    def get_topics(self):
+    def _get_topics(self):
         """Query the list of possible topics.
 
         Returns
@@ -477,6 +554,35 @@ class EfdClientSync(_EfdClientStatic):
         """
         topics = self._do_query("SHOW MEASUREMENTS")
         return topics["name"].tolist()
+
+    def get_topics(self, to_find=None, case_sensitive=False):
+        """Query the list of possible topics.
+        List can be filtered to return all the strings in topics which match
+        the topic query string if to_find argument is given.
+
+        Supports wildcards, which are denoted as `*``, as per shell globs.
+
+        Example:
+        >>> # assume topics are ['apple', 'banana', 'grape']
+        >>> getTopics(, 'a*p*')
+        ['apple', 'grape']
+
+        Parameters
+        ----------
+        to_find : `str`, optional
+            The query string, with optional wildcards denoted as *.
+        case_sensitive : `bool`, optional
+            If ``True``, the query is case sensitive. Defaults to ``False``.
+
+        Returns
+        -------
+        matches : `list` of `str`
+            The list of matching topics.
+        """
+        topics = self._get_topics()
+        if to_find is None:
+            return topics
+        return EfdClientTools.filter_topics(topics, to_find, case_sensitive)
 
     def get_fields(self, topic_name):
         """Query the list of field names for a topic.
@@ -560,7 +666,7 @@ class EfdClientSync(_EfdClientStatic):
             fields,
             start,
             end,
-            self._influx_client.db_name,
+            self._db_name,
             is_window,
             index,
             convert_influx_index,
@@ -778,8 +884,243 @@ class EfdClientSync(_EfdClientStatic):
         # A helper function that check if the specified topic is in the schema.
         # A topic is valid and returns `True` if it is in the cached list of
         # topics. Any other case returns `False`.
-        existing_topics = self.get_topics()
+        existing_topics = self._get_topics()
         return topic in existing_topics
+
+    def get_efd_data(
+        self,
+        topic,
+        *,
+        columns=None,
+        pre_padding=0,
+        post_padding=0,
+        day_obs=None,
+        begin=None,
+        end=None,
+        timespan=None,
+        event=None,
+        exp_record=None,
+        warn=True,
+    ):
+        """Get one or more EFD topics over a time range, synchronously.
+
+        The time range can be specified as either:
+            * a dayObs, in which case the full 24 hour period is used,
+            * a begin point and a end point,
+            * a begin point and a timespan.
+            * a mount event
+            * an exposure record
+        If it is desired to use an end time with a timespan, just specify
+        it as the begin time and use a negative timespan.
+
+        The results from all topics are merged into a single dataframe.
+
+        Parameters
+        ----------
+        topic : `str`
+            The topic to query.
+        columns : `list` of `str`, optional
+            The columns to query. If not specified, all columns are queried.
+        pre_padding : `float`
+            The amount of time before the nominal start of the query to
+            include, in seconds.
+        post_padding : `float`
+            The amount of extra time after the nominal end of the query to
+            include, in seconds.
+        day_obs : `int`, optional
+            The dayObs to query. If specified, this is used to determine
+            the begin and end times.
+        begin : `astropy.Time`, optional
+            The begin time for the query. If specified, either a end time or a
+            timespan must be supplied.
+        end : `astropy.Time`, optional
+            The end time for the query. If specified, a begin time must also be
+            supplied.
+        timespan : `astropy.TimeDelta`, optional
+            The timespan for the query. If specified, a begin time must also be
+            supplied.
+        event : `lsst.summit.utils.efdUtils.TmaEvent`, optional
+            The event to query. If specified, this is used to determine
+            the begin and end times, and all other options are disallowed.
+        exp_record : `lsst.daf.butler.dimensions.DimensionRecord`, optional
+            The exposure record containing the timespan to query. If specified,
+            all other options are disallowed.
+        warn : bool, optional
+            If ``True``, warn when no data is found. Exists so that
+            utility code can disable warnings when checking for data,
+            and therefore defaults to ``True``.
+
+        Returns
+        -------
+        data : `pd.DataFrame`
+            The merged data from all topics.
+
+        Raises
+        ------
+        ValueError:
+            If the topics are not in the EFD schema.
+        ValueError:
+            If both a dayObs and a begin/end or timespan are specified.
+        ValueError:
+            If a begin time is specified but no end time or timespan.
+
+        """
+        begin, end = get_begin_end(
+            day_obs, begin, end, timespan, event, exp_record
+        )
+        begin -= TimeDelta(pre_padding, format="sec")
+        end += TimeDelta(post_padding, format="sec")
+
+        if columns is None:
+            columns = ["*"]
+        columns = list(ensure_iterable(columns))
+
+        available_topics = self.get_topics()
+
+        if topic not in available_topics:
+            raise ValueError(f"Topic {topic} not in EFD schema")
+
+        data = self.select_time_series(topic, columns, begin.utc, end.utc)
+
+        if data.empty and warn:
+            raise Exception(
+                f"Topic {topic} is in the schema, but no data was returned "
+                "by the query for the specified time range"
+            )
+        return data
+
+    def get_most_recent_row_with_data_before(
+        self, topic, time_to_look_before, warn_stale_after_N_minutes=60 * 12
+    ):
+        """Get the most recent row of data for a topic before a given time.
+
+        Parameters
+        ----------
+        topic : `str`
+            The topic to query.
+        time_to_look_before : `astropy.Time`
+            The time to look before.
+        warn_stale_after_N_minutes : `float`, optional
+            The number of minutes after which to consider the
+            data stale and issue a warning.
+
+        Returns
+        -------
+        row : `pd.Series`
+            The row of data from the EFD containing the most
+            recent data before the specified time.
+
+        Raises
+        ------
+        ValueError:
+            If the topic is not in the EFD schema.
+        """
+        stale_age = datetime.timedelta(warn_stale_after_N_minutes)
+
+        first_day_possible = get_day_obs_start_time(20190101)
+
+        if time_to_look_before < first_day_possible:
+            raise ValueError(
+                f"Requested time {time_to_look_before} is before any data"
+                f"was put in the EFD"
+            )
+
+        df = pd.DataFrame()
+        beginTime = time_to_look_before
+        while df.empty and beginTime > first_day_possible:
+            df = self.get_efd_data(
+                topic, begin=beginTime, timespan=-TIME_CHUNKING, warn=False
+            )
+            beginTime -= TIME_CHUNKING
+
+        if (
+            beginTime < first_day_possible and df.empty
+        ):  # we ran all the way back to the beginning of time
+            raise ValueError(
+                f"The entire EFD was searched backwards from"
+                f"{time_to_look_before}"
+                f"and no data was found in {topic=}"
+            )
+
+        lastRow = df.iloc[-1]
+        commandTime = efd_timestamp_to_astropy(lastRow["private_efdStamp"])
+
+        commandAge = time_to_look_before - commandTime
+        if commandAge > stale_age:
+            log = logging.getLogger(__name__)
+            log.warning(
+                f"Component {topic} was last set"
+                f"{commandAge.sec/60:.1} minutes"
+                f" before the requested time"
+            )
+
+        return lastRow
+
+    def get_commands(
+        self,
+        commands,
+        begin,
+        end,
+        pre_padding,
+        post_padding,
+        time_format,
+    ):
+        """Retrieve the commands issued within a
+        specified time range.
+
+        Parameters
+        ----------
+        commands : `list`
+            A list of commands to retrieve.
+        begin : `astropy.time.Time`
+            The start time of the time range.
+        end : `astropy.time.Time`
+            The end time of the time range.
+        pre_padding : `float`
+            The amount of time to pad before the begin time.
+        post_padding : `float`
+            The amount of time to pad after the end time.
+        time_format : `str`
+            One of 'pandas' or 'astropy' or 'python'. If 'pandas',
+            the dictionary keys will be pandas timestamps, if 'astropy'
+            they will be astropy times and if 'python' they will be
+            python datetimes.
+
+        Returns
+        -------
+        command_times : `dict` [`time`, `str`]
+            A dictionary of the times at which the commands where issued.
+            The type that `time` takes is determined by the format key,
+            and defaults to python datetime.
+
+        Raises
+        ------
+        ValueError
+            Raise if there is already a command at a timestamp
+            in the dictionary,
+            i.e. there is a collision.
+        """
+        if time_format not in ["pandas", "astropy", "python"]:
+            raise ValueError(
+                f"format must be one of 'pandas',"
+                f"'astropy' or 'python', not {time_format=}"
+            )
+
+        commands = list(ensure_iterable(commands))
+
+        for command in commands:
+            data = self.get_efd_data(
+                command,
+                begin=begin,
+                end=end,
+                pre_padding=pre_padding,
+                post_padding=post_padding,
+                warn=False,  # most commands will not be issue so we expect many empty queries  # noqa: E501
+            )
+            command_times = EfdClientTools.get_command_times(
+                data, command, time_format
+            )
+        return command_times
 
     def get_schema(self, topic):
         """
@@ -855,16 +1196,39 @@ class EfdClient(_EfdClientStatic):
             result, convert_influx_index=convert_influx_index
         )
 
-    async def get_topics(self):
+    async def _get_topics(self):
+        #  Query the list of possible topics.
+        topics = await self._do_query("SHOW MEASUREMENTS")
+        return topics["name"].tolist()
+
+    async def get_topics(self, to_find=None, case_sensitive=False):
         """Query the list of possible topics.
+        List can be filtered to return all the strings in topics which match
+        the topic query string if to_find argument is given.
+
+        Supports wildcards, which are denoted as `*``, as per shell globs.
+
+        Example:
+        >>> # assume topics are ['apple', 'banana', 'grape']
+        >>> getTopics(, 'a*p*')
+        ['apple', 'grape']
+
+        Parameters
+        ----------
+        to_find : `str`, optional
+            The query string, with optional wildcards denoted as *.
+        case_sensitive : `bool`, optional
+            If ``True``, the query is case sensitive. Defaults to ``False``.
 
         Returns
         -------
-        results : `list`
-            List of valid topics in the database.
+        matches : `list` of `str`
+            The list of matching topics.
         """
-        topics = await self._do_query("SHOW MEASUREMENTS")
-        return topics["name"].tolist()
+        topics = await self._get_topics()
+        if to_find is None:
+            return topics
+        return EfdClientTools.filter_topics(topics, to_find, case_sensitive)
 
     async def get_fields(self, topic_name):
         """Query the list of field names for a topic.
@@ -1166,8 +1530,242 @@ class EfdClient(_EfdClientStatic):
         # A helper function that check if the specified topic is in the schema.
         # A topic is valid and returns `True` if it is in the cached list of
         # topics. Any other case returns `False`.
-        existing_topics = await self.get_topics()
+        existing_topics = await self._get_topics()
         return topic in existing_topics
+
+    async def get_efd_data(
+        self,
+        topic,
+        *,
+        columns=None,
+        pre_padding=0,
+        post_padding=0,
+        day_obs=None,
+        begin=None,
+        end=None,
+        timespan=None,
+        event=None,
+        exp_record=None,
+        warn=True,
+    ):
+        """Get one or more EFD topics over a time range, synchronously.
+
+        The time range can be specified as either:
+            * a dayObs, in which case the full 24 hour period is used,
+            * a begin point and a end point,
+            * a begin point and a timespan.
+            * a mount event
+            * an exposure record
+        If it is desired to use an end time with a timespan, just specify it
+        as the begin time and use a negative timespan.
+
+        The results from all topics are merged into a single dataframe.
+
+        Parameters
+        ----------
+        topic : `str`
+            The topic to query.
+        columns : `list` of `str`, optional
+            The columns to query. If not specified, all columns are queried.
+        pre_padding : `float`
+            The amount of time before the nominal start of the query to
+            include, in seconds.
+        post_padding : `float`
+            The amount of extra time after the nominal end of the query to
+            include, in seconds.
+        day_obs : `int`, optional
+            The dayObs to query. If specified, this is used to determine the
+            begin and end times.
+        begin : `astropy.Time`, optional
+            The begin time for the query. If specified, either a end time or a
+            timespan must be supplied.
+        end : `astropy.Time`, optional
+            The end time for the query. If specified, a begin time must also be
+            supplied.
+        timespan : `astropy.TimeDelta`, optional
+            The timespan for the query. If specified, a begin time must also be
+            supplied.
+        event : `lsst.summit.utils.efdUtils.TmaEvent`, optional
+            The event to query. If specified, this is used to determine the
+            begin and end times, and all other options are disallowed.
+        exp_record : `lsst.daf.butler.dimensions.DimensionRecord`, optional
+            The exposure record containing the timespan to query. If specified
+            all other options are disallowed.
+        warn : bool, optional
+            If ``True``, warn when no data is found. Exists so that utility
+            code can disable warnings when checking for data, and therefore
+            defaults to ``True``.
+
+        Returns
+        -------
+        data : `pd.DataFrame`
+            The merged data from all topics.
+
+        Raises
+        ------
+        ValueError:
+            If the topics are not in the EFD schema.
+        ValueError:
+            If both a dayObs and a begin/end or timespan are specified.
+        ValueError:
+            If a begin time is specified but no end time or timespan.
+
+        """
+        begin, end = get_begin_end(
+            day_obs, begin, end, timespan, event, exp_record
+        )
+        begin -= TimeDelta(pre_padding, format="sec")
+        end += TimeDelta(post_padding, format="sec")
+
+        if columns is None:
+            columns = ["*"]
+        columns = list(ensure_iterable(columns))
+
+        available_topics = await self.get_topics()
+
+        if topic not in available_topics:
+            raise ValueError(f"Topic {topic} not in EFD schema")
+
+        data = await self.select_time_series(
+            topic, columns, begin.utc, end.utc
+        )
+
+        if data.empty and warn:
+            raise Exception(
+                f"Topic {topic} is in the schema, but no data was returned "
+                "by the query for the specified time range"
+            )
+        return data
+
+    async def get_most_recent_row_with_data_before(
+        self, topic, time_to_look_before, warn_stale_after_N_minutes
+    ):
+        """Get the most recent row of data for a topic before a given time.
+
+        Parameters
+        ----------
+        topic : `str`
+            The topic to query.
+        time_to_look_before : `astropy.Time`
+            The time to look before.
+        warn_stale_after_N_minutes : `float`, optional
+            The number of minutes after which to consider the data
+            stale and issue a warning.
+
+        Returns
+        -------
+        row : `pd.Series`
+            The row of data from the EFD containing the most recent data
+            before the specified time.
+
+        Raises
+        ------
+        ValueError:
+            If the topic is not in the EFD schema.
+        """
+        stale_age = datetime.timedelta(warn_stale_after_N_minutes)
+
+        first_day_possible = get_day_obs_start_time(20190101)
+
+        if time_to_look_before < first_day_possible:
+            raise ValueError(
+                f"Requested time {time_to_look_before}"
+                f"is before any data was put in the EFD"
+            )
+
+        df = pd.DataFrame()
+        begin_time = time_to_look_before
+        while df.empty and begin_time > first_day_possible:
+            df = await self.get_efd_data(
+                topic, begin=begin_time, timespan=-TIME_CHUNKING, warn=False
+            )
+            begin_time -= TIME_CHUNKING
+
+        if (
+            begin_time < first_day_possible and df.empty
+        ):  # we ran all the way back to the beginning of time
+            raise ValueError(
+                f"The entire EFD was searched backwards from"
+                f"{time_to_look_before} and no data was found in {topic=}"
+            )
+
+        lastRow = df.iloc[-1]
+        commandTime = efd_timestamp_to_astropy(lastRow["private_efdStamp"])
+
+        commandAge = time_to_look_before - commandTime
+        if commandAge > stale_age:
+            log = logging.getLogger(__name__)
+            log.warning(
+                f"Component {topic} was last set {commandAge.sec/60:.1}"
+                "minutes before the requested time"
+            )
+
+        return lastRow
+
+    async def get_commands(
+        self,
+        commands,
+        begin,
+        end,
+        pre_padding,
+        post_padding,
+        time_format,
+    ):
+        """Retrieve the commands issued within a specified time range.
+
+        Parameters
+        ----------
+        commands : `list`
+            A list of commands to retrieve.
+        begin : `astropy.time.Time`
+            The start time of the time range.
+        end : `astropy.time.Time`
+            The end time of the time range.
+        pre_padding : `float`
+            The amount of time to pad before the begin time.
+        post_padding : `float`
+            The amount of time to pad after the end time.
+        time_format : `str`
+            One of 'pandas' or 'astropy' or 'python'. If 'pandas',
+            the dictionary keys will be pandas timestamps, if 'astropy'
+            they will be astropy times and if 'python' they will be
+            python datetimes.
+
+        Returns
+        -------
+        command_times : `dict` [`time`, `str`]
+            A dictionary of the times at which the commands where issued.
+            The type that `time` takes is determined by the format key,
+            and defaults to python datetime.
+
+        Raises
+        ------
+        ValueError
+            Raise if there is already a command at a timestamp
+            in the dictionary,
+            i.e. there is a collision.
+        """
+        if time_format not in ["pandas", "astropy", "python"]:
+            raise ValueError(
+                f"format must be one of 'pandas',"
+                f"'astropy' or 'python', not {time_format=}"
+            )
+
+        commands = list(ensure_iterable(commands))
+
+        for command in commands:
+            data = await self.get_efd_data(
+                command,
+                begin=begin,
+                end=end,
+                pre_padding=pre_padding,
+                post_padding=post_padding,
+                warn=False,  # most commands will not be issue so we expect many empty queries  # noqa: E501
+            )
+            command_times = EfdClientTools.get_command_times(
+                data, command, time_format
+            )
+        return command_times
 
     async def get_schema(self, topic):
         """

@@ -1,6 +1,7 @@
 """Free functions to help out with EFD operations."""
 
 import contextlib
+import datetime
 import json
 from collections.abc import Mapping
 from typing import Any
@@ -9,7 +10,8 @@ import fastavro
 import numpy as np
 import pandas as pd
 import requests
-from astropy.time import Time
+from astropy import units as u
+from astropy.time import Time, TimeDelta
 from kafkit.httputils import format_url
 from kafkit.registry.sansio import (
     SchemaCache,
@@ -317,3 +319,191 @@ class SyncSchemaParser:
             "subject": result["subject"],
             "schema": schema,
         }
+
+
+def get_day_obs_start_time(day_obs):
+    """Get the start of the given dayObs as an astropy.time.Time object.
+
+    The observatory rolls the date over at UTC-12.
+
+    Parameters
+    ----------
+    day_obs : `int`
+        The day_obs, as an integer, e.g. 20231225
+
+    Returns
+    -------
+    time : `astropy.time.Time`
+        The start of the dayObs as an astropy.time.Time object.
+    """
+    pythonDateTime = datetime.datetime.strptime(str(day_obs), "%Y%m%d")
+    return Time(pythonDateTime) + 12 * u.hour
+
+
+def get_day_obs_end_time(day_obs):
+    """Get the end of the given dayObs as an astropy.time.Time object.
+
+    Parameters
+    ----------
+    day_obs : `int`
+        The dayObs, as an integer, e.g. 20231225
+
+    Returns
+    -------
+    time : `astropy.time.Time`
+        The end of the dayObs as an astropy.time.Time object.
+    """
+    return get_day_obs_start_time(day_obs) + 24 * u.hour
+
+
+def get_begin_end(
+    day_obs=None,
+    begin=None,
+    end=None,
+    timespan=None,
+    event=None,
+    exp_record=None,
+):
+    """Calculate the begin and end times to pass to _getEfdData, given the
+    kwargs passed to getEfdData.
+
+    Parameters
+    ----------
+    day_obs : `int | None`
+        The dayObs to query. If specified, this is used to determine the begin
+        and end times.
+    begin : `astropy.time.Time`
+        The begin time for the query. If specified, either an end time or a
+        timespan must be supplied.
+    end : `astropy.time.Time`
+        The end time for the query. If specified, a begin time must also be
+        supplied.
+    timespan : `astropy.time.TimeDelta`
+        The timespan for the query. If specified, a begin time must also be
+        supplied.
+    event : `lsst.summit.utils.efdUtils.TmaEvent`
+        The event to query. If specified, this is used to determine the begin
+        and end times, and all other options are disallowed.
+    exp_record : `lsst.daf.butler.dimensions.DimensionRecord`
+        The exposure record containing the timespan to query. If specified, all
+        other options are disallowed.
+
+    Returns
+    -------
+    begin : `astropy.Time`
+        The begin time for the query.
+    end : `astropy.Time`
+        The end time for the query.
+    """
+    if exp_record is not None:
+        forbiddenOpts = [event, begin, end, timespan, day_obs]
+        if any(x is not None for x in forbiddenOpts):
+            raise ValueError(
+                "You can't specify both an expRecord and a "
+                "begin/end or timespan or dayObs"
+            )
+        begin = exp_record.timespan.begin
+        end = exp_record.timespan.end
+        return begin, end
+
+    if event is not None:
+        forbiddenOpts = [begin, end, timespan, day_obs]
+        if any(x is not None for x in forbiddenOpts):
+            raise ValueError(
+                "You can't specify both an event and a "
+                "begin/end or timespan or dayObs"
+            )
+        begin = event.begin
+        end = event.end
+        return begin, end
+
+    # check for dayObs, and that other options aren't inconsistently specified
+    if day_obs is not None:
+        forbiddenOpts = [begin, end, timespan]
+        if any(x is not None for x in forbiddenOpts):
+            raise ValueError(
+                "You can't specify both a dayObs and a "
+                "begin/end or timespan"
+            )
+        begin = get_day_obs_start_time(day_obs)
+        end = get_day_obs_end_time(day_obs)
+        return begin, end
+    # can now disregard dayObs entirely
+
+    if begin is None:
+        raise ValueError(
+            "You must specify either a dayObs or a "
+            "begin/end or begin/timespan"
+        )
+    # can now rely on begin, so just need to deal with end/timespan
+
+    if end is None and timespan is None:
+        raise ValueError(
+            "If you specify a begin, you must specify either a "
+            "end or a timespan"
+        )
+    if end is not None and timespan is not None:
+        raise ValueError("You can't specify both a end and a timespan")
+    if end is None:
+        if timespan > datetime.timedelta(minutes=0):
+            end = begin + timespan  # the normal case
+        else:
+            end = begin  # the case where timespan is negative
+            begin = (
+                begin + timespan
+            )  # adding the negative to the start, i.e. subtracting it to bring back # noqa: E501
+
+    assert begin is not None
+    assert end is not None
+    return begin, end
+
+
+def get_day_obs_for_time(time):
+    """Get the dayObs in which an astropy.time.Time object falls.
+
+    Parameters
+    ----------
+    time : `astropy.time.Time`
+        The time.
+
+    Returns
+    -------
+    dayObs : `int`
+        The dayObs, as an integer, e.g. 20231225
+    """
+    twelveHours = datetime.timedelta(hours=-12)
+    offset = TimeDelta(twelveHours, format="datetime")
+    return int((time + offset).utc.isot[:10].replace("-", ""))
+
+
+def efd_timestamp_to_astropy(timestamp):
+    """Get an efd timestamp as an astropy.time.Time object.
+
+    Parameters
+    ----------
+    timestamp : `float`
+        The timestamp, as a float.
+
+    Returns
+    -------
+    time : `astropy.time.Time`
+        The timestamp as an astropy.time.Time object.
+    """
+    return Time(timestamp, format="unix")
+
+
+def astropy_to_efd_timestamp(time):
+    """Get astropy Time object as an efd timestamp
+
+    Parameters
+    ----------
+    time : `astropy.time.Time`
+        The time as an astropy.time.Time object.
+
+    Returns
+    -------
+    timestamp : `float`
+        The timestamp, in UTC, in unix seconds.
+    """
+
+    return time.utc.unix
