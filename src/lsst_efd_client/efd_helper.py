@@ -24,6 +24,7 @@ from .efd_utils import (
     get_begin_end,
     get_day_obs_start_time,
     merge_packed_time_series,
+    check_time_format
 )
 
 # When looking backwards in time to find the most recent state event, look back
@@ -1026,15 +1027,15 @@ class EfdClientSync(_EfdClientStatic):
             )
 
         df = pd.DataFrame()
-        beginTime = time_to_look_before
-        while df.empty and beginTime > first_day_possible:
+        begin_time = time_to_look_before
+        while df.empty and begin_time > first_day_possible:
             df = self.get_efd_data(
-                topic, begin=beginTime, timespan=-TIME_CHUNKING, warn=False
+                topic, begin=begin_time, timespan=-TIME_CHUNKING, warn=False
             )
-            beginTime -= TIME_CHUNKING
+            begin_time -= TIME_CHUNKING
 
         if (
-            beginTime < first_day_possible and df.empty
+            begin_time < first_day_possible and df.empty
         ):  # we ran all the way back to the beginning of time
             raise ValueError(
                 f"The entire EFD was searched backwards from"
@@ -1042,19 +1043,19 @@ class EfdClientSync(_EfdClientStatic):
                 f"and no data was found in {topic=}"
             )
 
-        lastRow = df.iloc[-1]
-        commandTime = efd_timestamp_to_astropy(lastRow["private_efdStamp"])
+        last_row = df.iloc[-1]
+        command_time = efd_timestamp_to_astropy(last_row["private_efdStamp"])
 
-        commandAge = time_to_look_before - commandTime
-        if commandAge > stale_age:
+        command_age = time_to_look_before - command_time
+        if command_age > stale_age:
             log = logging.getLogger(__name__)
             log.warning(
                 f"Component {topic} was last set"
-                f"{commandAge.sec/60:.1} minutes"
+                f"{command_age.sec/60:.1} minutes"
                 f" before the requested time"
             )
 
-        return lastRow
+        return last_row
 
     def get_commands(
         self,
@@ -1100,12 +1101,7 @@ class EfdClientSync(_EfdClientStatic):
             in the dictionary,
             i.e. there is a collision.
         """
-        if time_format not in ["pandas", "astropy", "python"]:
-            raise ValueError(
-                f"format must be one of 'pandas',"
-                f"'astropy' or 'python', not {time_format=}"
-            )
-
+        check_time_format(time_format)
         commands = list(ensure_iterable(commands))
 
         for command in commands:
@@ -1689,18 +1685,18 @@ class EfdClient(_EfdClientStatic):
                 f"{time_to_look_before} and no data was found in {topic=}"
             )
 
-        lastRow = df.iloc[-1]
-        commandTime = efd_timestamp_to_astropy(lastRow["private_efdStamp"])
+        last_row = df.iloc[-1]
+        command_time = efd_timestamp_to_astropy(last_row["private_efdStamp"])
 
-        commandAge = time_to_look_before - commandTime
-        if commandAge > stale_age:
+        command_age = time_to_look_before - command_time
+        if command_age > stale_age:
             log = logging.getLogger(__name__)
             log.warning(
-                f"Component {topic} was last set {commandAge.sec/60:.1}"
+                f"Component {topic} was last set {command_age.sec/60:.1}"
                 "minutes before the requested time"
             )
 
-        return lastRow
+        return last_row
 
     async def get_commands(
         self,
@@ -1745,12 +1741,7 @@ class EfdClient(_EfdClientStatic):
             in the dictionary,
             i.e. there is a collision.
         """
-        if time_format not in ["pandas", "astropy", "python"]:
-            raise ValueError(
-                f"format must be one of 'pandas',"
-                f"'astropy' or 'python', not {time_format=}"
-            )
-
+        check_time_format(time_format)
         commands = list(ensure_iterable(commands))
 
         for command in commands:

@@ -507,3 +507,22 @@ def astropy_to_efd_timestamp(time):
     """
 
     return time.utc.unix
+
+
+def check_time_format(time_format):
+    """Raise exception if time_format not in ['pandas', 'astropy', 'python'].
+
+    Parameters:
+    -----------
+    time_format: `str`
+        The time format to check.
+
+    Raises
+    -------
+    ValueError: if time_format not in ['pandas', 'astropy', 'python']
+    """
+    if time_format not in ["pandas", "astropy", "python"]:
+        raise ValueError(
+            f"format must be one of 'pandas',"
+            f"'astropy' or 'python', not {time_format=}"
+        )
