@@ -906,7 +906,7 @@ class EfdClientSync(_EfdClientStatic):
         """Get one or more EFD topics over a time range, synchronously.
 
         The time range can be specified as either:
-            * a dayObs, in which case the full 24 hour period is used,
+            * a dayObs, in which case the full 24 hour period is used
             * a begin point and a end point
             * a begin point and a timespan
             * a mount event
@@ -1547,7 +1547,7 @@ class EfdClient(_EfdClientStatic):
         """Get one or more EFD topics over a time range, synchronously.
 
         The time range can be specified as either:
-            * a dayObs, in which case the full 24 hour period is used,
+            * a dayObs, in which case the full 24 hour period is used
             * a begin point and a end point
             * a begin point and a timespan
             * a mount event
