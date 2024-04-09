@@ -911,6 +911,7 @@ class EfdClientSync(_EfdClientStatic):
             * a begin point and a timespan
             * a mount event
             * an exposure record
+
         If it is desired to use an end time with a timespan, just specify
         it as the begin time and use a negative timespan.
 
@@ -1552,6 +1553,7 @@ class EfdClient(_EfdClientStatic):
             * a begin point and a timespan
             * a mount event
             * an exposure record
+
         If it is desired to use an end time with a timespan, just specify it
         as the begin time and use a negative timespan.
 
