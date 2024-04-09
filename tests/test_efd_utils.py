@@ -33,6 +33,7 @@ from astropy.time import Time
 
 try:
     from lsst.summit.utils.tmaUtils import TMAEvent, TMAState
+
     lsst_summit_utils_imported = True
 except ImportError:
     Warning("Could not import TMAEvent and TMAState")
