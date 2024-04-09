@@ -33,8 +33,10 @@ from astropy.time import Time
 
 try:
     from lsst.summit.utils.tmaUtils import TMAEvent, TMAState
+    lsst_summit_utils_imported = True
 except ImportError:
     Warning("Could not import TMAEvent and TMAState")
+    lsst_summit_utils_imported = False
 from lsst_efd_client import EfdClient, EfdClientSync
 from lsst_efd_client.efd_utils import (
     astropy_to_efd_timestamp,
@@ -65,7 +67,6 @@ def make_synchronous_efd_client():
     yield efd_client
 
 
-@unittest.skip("Skipping tests until imports resolved")
 class EfdUtilsTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -73,19 +74,20 @@ class EfdUtilsTestCase(unittest.TestCase):
         # get a sample expRecord here to test expRecordToTimespan
         cls.axis_topic = "lsst.sal.MTMount.logevent_azimuthMotionState"
         cls.time_series_topic = "lsst.sal.MTMount.azimuth"
-        cls.event = TMAEvent(
-            dayObs=20230531,
-            seqNum=27,
-            type=TMAState.TRACKING,
-            endReason=TMAState.SLEWING,
-            duration=0.47125244140625,
-            begin=Time(1685578353.2265284, scale="utc", format="unix"),
-            end=Time(1685578353.6977808, scale="utc", format="unix"),
-            blockInfos=None,
-            version=0,
-            _startRow=254,
-            _endRow=255,
-        )
+        if lsst_summit_utils_imported:
+            cls.event = TMAEvent(
+                dayObs=20230531,
+                seqNum=27,
+                type=TMAState.TRACKING,
+                endReason=TMAState.SLEWING,
+                duration=0.47125244140625,
+                begin=Time(1685578353.2265284, scale="utc", format="unix"),
+                end=Time(1685578353.6977808, scale="utc", format="unix"),
+                blockInfos=None,
+                version=0,
+                _startRow=254,
+                _endRow=255,
+            )
 
     def test_get_day_obs_as_times(self):
         """This tests getDayObsStartTime and getDayObsEndTime explicitly,
@@ -162,10 +164,42 @@ class EfdUtilsTestCase(unittest.TestCase):
             )
             self.assertTrue(day_obs_data.equals(day_start_end_data))
 
+            with self.assertRaises(ValueError):
+                # not enough info to constrain
+                _ = efd_client.get_efd_data(self.axis_topic)
+                # dayObs supplied and a start time is not allowed
+                _ = efd_client.get_efd_data(
+                    self.axis_topic, day_obs=self.day_obs, begin=day_start
+                )
+                # dayObs supplied and a stop time is not allowed
+                _ = efd_client.get_efd_data(
+                    self.axis_topic, day_obs=self.day_obs, end=day_end
+                )
+                # dayObs supplied and timespan is not allowed
+                _ = efd_client.get_efd_data(
+                    self.axis_topic, day_obs=self.day_obs, timespan=one_day
+                )
+                # being alone is not allowed
+                _ = efd_client.get_efd_data(
+                    self.axis_topic, begin=self.day_obs
+                )
+                # good query, except the topic doesn't exist
+                _ = efd_client.get_efd_data(
+                    "badTopic", begin=day_start, end=day_end
+                )
+
+    @unittest.skipIf(not lsst_summit_utils_imported, "Skipping TMAEvent tests")
+    @safe_vcr.use_cassette()
+    def test_get_efd_data_event(self):
+        with make_synchronous_efd_client() as efd_client:
             # test event
             # note that here we're going to clip to an event and pad things, so
             # we want to use the timeSeriesTopic not the states, so that
             # there's plenty of rows to test the padding is actually working
+            day_obs_data = efd_client.get_efd_data(
+                self.axis_topic, day_obs=self.day_obs
+            )
+
             event_data = efd_client.get_efd_data(
                 self.time_series_topic, event=self.event
             )
@@ -196,30 +230,6 @@ class EfdUtilsTestCase(unittest.TestCase):
             self.assertLess(
                 end_time_diff.sec, 2.1
             )  # padding isn't super exact, so give a little wiggle room  # noqa: E501
-
-            with self.assertRaises(ValueError):
-                # not enough info to constrain
-                _ = efd_client.get_efd_data(self.axis_topic)
-                # dayObs supplied and a start time is not allowed
-                _ = efd_client.get_efd_data(
-                    self.axis_topic, day_obs=self.day_obs, begin=day_start
-                )
-                # dayObs supplied and a stop time is not allowed
-                _ = efd_client.get_efd_data(
-                    self.axis_topic, day_obs=self.day_obs, end=day_end
-                )
-                # dayObs supplied and timespan is not allowed
-                _ = efd_client.get_efd_data(
-                    self.axis_topic, day_obs=self.day_obs, timespan=one_day
-                )
-                # being alone is not allowed
-                _ = efd_client.get_efd_data(
-                    self.axis_topic, begin=self.day_obs
-                )
-                # good query, except the topic doesn't exist
-                _ = efd_client.get_efd_data(
-                    "badTopic", begin=day_start, end=day_end
-                )
 
     @safe_vcr.use_cassette()
     def test_get_most_recent_row_with_data_before(self):
