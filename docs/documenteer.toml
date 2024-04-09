@@ -12,7 +12,7 @@ rst_epilog_file = "_rst_epilog.rst"
 python = "https://docs.python.org/3/"
 aiohttp = "https://docs.aiohttp.org/en/stable/"
 aioinflux = "https://aioinflux.readthedocs.io/en/stable/"
-astropy = "http://docs.astropy.org/en/v5.1.x/"
+astropy = "http://docs.astropy.org/en/stable/"
 pandas = "https://pandas.pydata.org/pandas-docs/stable/"
 
 [sphinx.linkcheck]

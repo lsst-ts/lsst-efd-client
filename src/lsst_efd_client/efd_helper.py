@@ -561,7 +561,7 @@ class EfdClientSync(_EfdClientStatic):
         List can be filtered to return all the strings in topics which match
         the topic query string if to_find argument is given.
 
-        Supports wildcards, which are denoted as `*``, as per shell globs.
+        Supports wildcards, which are denoted as '*', as per shell globs.
 
         Example:
         >>> # assume topics are ['apple', 'banana', 'grape']
@@ -571,7 +571,7 @@ class EfdClientSync(_EfdClientStatic):
         Parameters
         ----------
         to_find : `str`, optional
-            The query string, with optional wildcards denoted as *.
+            The query string, with optional wildcards denoted as '*'.
         case_sensitive : `bool`, optional
             If ``True``, the query is case sensitive. Defaults to ``False``.
 
@@ -953,7 +953,7 @@ class EfdClientSync(_EfdClientStatic):
 
         Returns
         -------
-        data : `pd.DataFrame`
+        data : `pandas.DataFrame`
             The merged data from all topics.
 
         Raises
@@ -1007,7 +1007,7 @@ class EfdClientSync(_EfdClientStatic):
 
         Returns
         -------
-        row : `pd.Series`
+        row : `pandas.Series`
             The row of data from the EFD containing the most
             recent data before the specified time.
 
@@ -1202,7 +1202,7 @@ class EfdClient(_EfdClientStatic):
         List can be filtered to return all the strings in topics which match
         the topic query string if to_find argument is given.
 
-        Supports wildcards, which are denoted as `*``, as per shell globs.
+        Supports wildcards, which are denoted as '*', as per shell globs.
 
         Example:
         >>> # assume topics are ['apple', 'banana', 'grape']
@@ -1212,9 +1212,9 @@ class EfdClient(_EfdClientStatic):
         Parameters
         ----------
         to_find : `str`, optional
-            The query string, with optional wildcards denoted as *.
+            The query string, with optional wildcards denoted as '*'.
         case_sensitive : `bool`, optional
-            If ``True``, the query is case sensitive. Defaults to ``False``.
+            If True, the query is case sensitive. Defaults to False.
 
         Returns
         -------
@@ -1594,7 +1594,7 @@ class EfdClient(_EfdClientStatic):
 
         Returns
         -------
-        data : `pd.DataFrame`
+        data : `pandas.DataFrame`
             The merged data from all topics.
 
         Raises
@@ -1650,7 +1650,7 @@ class EfdClient(_EfdClientStatic):
 
         Returns
         -------
-        row : `pd.Series`
+        row : `pandas.Series`
             The row of data from the EFD containing the most recent data
             before the specified time.
 
