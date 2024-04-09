@@ -20,11 +20,11 @@ from lsst.utils.iteration import ensure_iterable
 from .auth_helper import NotebookAuth
 from .efd_utils import (
     SyncSchemaParser,
+    check_time_format,
     efd_timestamp_to_astropy,
     get_begin_end,
     get_day_obs_start_time,
     merge_packed_time_series,
-    check_time_format
 )
 
 # When looking backwards in time to find the most recent state event, look back
