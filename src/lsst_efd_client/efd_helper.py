@@ -931,7 +931,7 @@ class EfdClientSync(_EfdClientStatic):
         day_obs : `int`, optional
             The dayObs to query. If specified, this is used to determine
             the begin and end times.
-        begin : `astropy.Time`, optional
+        begin : `astropy.time.Time`, optional
             The begin time for the query. If specified, either a end time or a
             timespan must be supplied.
         end : `astropy.time.Time`, optional
@@ -940,10 +940,10 @@ class EfdClientSync(_EfdClientStatic):
         timespan : `astropy.time.TimeDelta`, optional
             The timespan for the query. If specified, a begin time must also be
             supplied.
-        event : lsst.summit.utils.efdUtils.TmaEvent, optional
+        event : ``lsst.summit.utils.efdUtils.TmaEvent``, optional
             The event to query. If specified, this is used to determine
             the begin and end times, and all other options are disallowed.
-        exp_record : lsst.daf.butler.dimensions.DimensionRecord, optional
+        exp_record : ``lsst.daf.butler.dimensions.DimensionRecord``, optional
             The exposure record containing the timespan to query. If specified,
             all other options are disallowed.
         warn : bool, optional
@@ -1581,10 +1581,10 @@ class EfdClient(_EfdClientStatic):
         timespan : `astropy.time.TimeDelta`, optional
             The timespan for the query. If specified, a begin time must also be
             supplied.
-        event : lsst.summit.utils.efdUtils.TmaEvent, optional
+        event : ``lsst.summit.utils.efdUtils.TmaEvent``, optional
             The event to query. If specified, this is used to determine the
             begin and end times, and all other options are disallowed.
-        exp_record : lsst.daf.butler.dimensions.DimensionRecord, optional
+        exp_record : ``lsst.daf.butler.dimensions.DimensionRecord``, optional
             The exposure record containing the timespan to query. If specified
             all other options are disallowed.
         warn : bool, optional
