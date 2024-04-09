@@ -907,8 +907,8 @@ class EfdClientSync(_EfdClientStatic):
 
         The time range can be specified as either:
             * a dayObs, in which case the full 24 hour period is used,
-            * a begin point and a end point,
-            * a begin point and a timespan.
+            * a begin point and a end point
+            * a begin point and a timespan
             * a mount event
             * an exposure record
         If it is desired to use an end time with a timespan, just specify
@@ -946,7 +946,7 @@ class EfdClientSync(_EfdClientStatic):
         exp_record : ``lsst.daf.butler.dimensions.DimensionRecord``, optional
             The exposure record containing the timespan to query. If specified,
             all other options are disallowed.
-        warn : bool, optional
+        warn : `bool`, optional
             If ``True``, warn when no data is found. Exists so that
             utility code can disable warnings when checking for data,
             and therefore defaults to ``True``.
@@ -1548,8 +1548,8 @@ class EfdClient(_EfdClientStatic):
 
         The time range can be specified as either:
             * a dayObs, in which case the full 24 hour period is used,
-            * a begin point and a end point,
-            * a begin point and a timespan.
+            * a begin point and a end point
+            * a begin point and a timespan
             * a mount event
             * an exposure record
         If it is desired to use an end time with a timespan, just specify it
@@ -1587,7 +1587,7 @@ class EfdClient(_EfdClientStatic):
         exp_record : ``lsst.daf.butler.dimensions.DimensionRecord``, optional
             The exposure record containing the timespan to query. If specified
             all other options are disallowed.
-        warn : bool, optional
+        warn : `bool`, optional
             If ``True``, warn when no data is found. Exists so that utility
             code can disable warnings when checking for data, and therefore
             defaults to ``True``.
