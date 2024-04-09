@@ -934,16 +934,16 @@ class EfdClientSync(_EfdClientStatic):
         begin : `astropy.Time`, optional
             The begin time for the query. If specified, either a end time or a
             timespan must be supplied.
-        end : `astropy.Time`, optional
+        end : `astropy.time.Time`, optional
             The end time for the query. If specified, a begin time must also be
             supplied.
-        timespan : `astropy.TimeDelta`, optional
+        timespan : `astropy.time.TimeDelta`, optional
             The timespan for the query. If specified, a begin time must also be
             supplied.
-        event : `lsst.summit.utils.efdUtils.TmaEvent`, optional
+        event : lsst.summit.utils.efdUtils.TmaEvent, optional
             The event to query. If specified, this is used to determine
             the begin and end times, and all other options are disallowed.
-        exp_record : `lsst.daf.butler.dimensions.DimensionRecord`, optional
+        exp_record : lsst.daf.butler.dimensions.DimensionRecord, optional
             The exposure record containing the timespan to query. If specified,
             all other options are disallowed.
         warn : bool, optional
@@ -999,7 +999,7 @@ class EfdClientSync(_EfdClientStatic):
         ----------
         topic : `str`
             The topic to query.
-        time_to_look_before : `astropy.Time`
+        time_to_look_before : `astropy.time.Time`
             The time to look before.
         warn_stale_after_N_minutes : `float`, optional
             The number of minutes after which to consider the
@@ -1572,19 +1572,19 @@ class EfdClient(_EfdClientStatic):
         day_obs : `int`, optional
             The dayObs to query. If specified, this is used to determine the
             begin and end times.
-        begin : `astropy.Time`, optional
+        begin : `astropy.time.Time`, optional
             The begin time for the query. If specified, either a end time or a
             timespan must be supplied.
-        end : `astropy.Time`, optional
+        end : `astropy.time.Time`, optional
             The end time for the query. If specified, a begin time must also be
             supplied.
-        timespan : `astropy.TimeDelta`, optional
+        timespan : `astropy.time.TimeDelta`, optional
             The timespan for the query. If specified, a begin time must also be
             supplied.
-        event : `lsst.summit.utils.efdUtils.TmaEvent`, optional
+        event : lsst.summit.utils.efdUtils.TmaEvent, optional
             The event to query. If specified, this is used to determine the
             begin and end times, and all other options are disallowed.
-        exp_record : `lsst.daf.butler.dimensions.DimensionRecord`, optional
+        exp_record : lsst.daf.butler.dimensions.DimensionRecord, optional
             The exposure record containing the timespan to query. If specified
             all other options are disallowed.
         warn : bool, optional
@@ -1642,7 +1642,7 @@ class EfdClient(_EfdClientStatic):
         ----------
         topic : `str`
             The topic to query.
-        time_to_look_before : `astropy.Time`
+        time_to_look_before : `astropy.time.Time`
             The time to look before.
         warn_stale_after_N_minutes : `float`, optional
             The number of minutes after which to consider the data
