@@ -922,10 +922,10 @@ class EfdClientSync(_EfdClientStatic):
             The topic to query.
         columns : `list` of `str`, optional
             The columns to query. If not specified, all columns are queried.
-        pre_padding : `float`
+        pre_padding : `float`, optional
             The amount of time before the nominal start of the query to
             include, in seconds.
-        post_padding : `float`
+        post_padding : `float`, optional
             The amount of extra time after the nominal end of the query to
             include, in seconds.
         day_obs : `int`, optional
