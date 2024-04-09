@@ -958,11 +958,11 @@ class EfdClientSync(_EfdClientStatic):
 
         Raises
         ------
-        ValueError:
+        ValueError
             If the topics are not in the EFD schema.
-        ValueError:
+        ValueError
             If both a dayObs and a begin/end or timespan are specified.
-        ValueError:
+        ValueError
             If a begin time is specified but no end time or timespan.
 
         """
@@ -1013,7 +1013,7 @@ class EfdClientSync(_EfdClientStatic):
 
         Raises
         ------
-        ValueError:
+        ValueError
             If the topic is not in the EFD schema.
         """
         stale_age = datetime.timedelta(warn_stale_after_N_minutes)
@@ -1599,11 +1599,11 @@ class EfdClient(_EfdClientStatic):
 
         Raises
         ------
-        ValueError:
+        ValueError
             If the topics are not in the EFD schema.
-        ValueError:
+        ValueError
             If both a dayObs and a begin/end or timespan are specified.
-        ValueError:
+        ValueError
             If a begin time is specified but no end time or timespan.
 
         """
@@ -1656,7 +1656,7 @@ class EfdClient(_EfdClientStatic):
 
         Raises
         ------
-        ValueError:
+        ValueError
             If the topic is not in the EFD schema.
         """
         stale_age = datetime.timedelta(warn_stale_after_N_minutes)
