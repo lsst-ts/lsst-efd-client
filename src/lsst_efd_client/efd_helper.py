@@ -941,7 +941,7 @@ class EfdClientSync(_EfdClientStatic):
         timespan : `astropy.time.TimeDelta`, optional
             The timespan for the query. If specified, a begin time must also be
             supplied.
-        tma_event : `lsst.summit.utils.efdUtils.TmaEvent`, optional
+        tma_event : ``lsst.summit.utils.efdUtils.TmaEvent``, optional
             The tma_event to query. If specified, this is used to determine
             the begin and end times, and all other options are disallowed.
         exp_record : ``lsst.daf.butler.dimensions.DimensionRecord``, optional
@@ -1584,7 +1584,7 @@ class EfdClient(_EfdClientStatic):
         timespan : `astropy.time.TimeDelta`, optional
             The timespan for the query. If specified, a begin time must also be
             supplied.
-        tma_event : `lsst.summit.utils.efdUtils.TmaEvent`, optional
+        tma_event : ``lsst.summit.utils.efdUtils.TmaEvent``, optional
             The tma_event to query. If specified, this is used to determine the
             begin and end times, and all other options are disallowed.
         exp_record : ``lsst.daf.butler.dimensions.DimensionRecord``, optional
