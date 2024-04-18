@@ -985,7 +985,8 @@ class EfdClientSync(_EfdClientStatic):
         data = self.select_time_series(topic, columns, begin.utc, end.utc)
 
         if data.empty and warn:
-            raise Exception(
+            log = logging.getLogger(__name__)
+            log.warning(
                 f"Topic {topic} is in the schema, but no data was returned "
                 "by the query for the specified time range"
             )
@@ -1629,7 +1630,8 @@ class EfdClient(_EfdClientStatic):
         )
 
         if data.empty and warn:
-            raise Exception(
+            log = logging.getLogger(__name__)
+            log.warning(
                 f"Topic {topic} is in the schema, but no data was returned "
                 "by the query for the specified time range"
             )
