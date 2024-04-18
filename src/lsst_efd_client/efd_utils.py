@@ -381,7 +381,7 @@ def get_begin_end(
     timespan : `astropy.time.TimeDelta`
         The timespan for the query. If specified, a begin time must also be
         supplied.
-    event : `lsst.summit.utils.efdUtils.TmaEvent`
+    event : `tmaEvent`
         The event to query. If specified, this is used to determine the begin
         and end times, and all other options are disallowed.
     exp_record : `lsst.daf.butler.dimensions.DimensionRecord`
