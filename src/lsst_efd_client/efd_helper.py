@@ -899,7 +899,7 @@ class EfdClientSync(_EfdClientStatic):
         begin=None,
         end=None,
         timespan=None,
-        event=None,
+        tma_event=None,
         exp_record=None,
         warn=True,
     ):
@@ -941,8 +941,8 @@ class EfdClientSync(_EfdClientStatic):
         timespan : `astropy.time.TimeDelta`, optional
             The timespan for the query. If specified, a begin time must also be
             supplied.
-        event : ``lsst.summit.utils.efdUtils.TmaEvent``, optional
-            The event to query. If specified, this is used to determine
+        tma_event : `lsst.summit.utils.efdUtils.TmaEvent`, optional
+            The tma_event to query. If specified, this is used to determine
             the begin and end times, and all other options are disallowed.
         exp_record : ``lsst.daf.butler.dimensions.DimensionRecord``, optional
             The exposure record containing the timespan to query. If specified,
@@ -968,7 +968,7 @@ class EfdClientSync(_EfdClientStatic):
 
         """
         begin, end = get_begin_end(
-            day_obs, begin, end, timespan, event, exp_record
+            day_obs, begin, end, timespan, tma_event, exp_record
         )
         begin -= TimeDelta(pre_padding, format="sec")
         end += TimeDelta(post_padding, format="sec")
@@ -1542,7 +1542,7 @@ class EfdClient(_EfdClientStatic):
         begin=None,
         end=None,
         timespan=None,
-        event=None,
+        tma_event=None,
         exp_record=None,
         warn=True,
     ):
@@ -1584,8 +1584,8 @@ class EfdClient(_EfdClientStatic):
         timespan : `astropy.time.TimeDelta`, optional
             The timespan for the query. If specified, a begin time must also be
             supplied.
-        event : ``tmaEvent``, optional
-            The event to query. If specified, this is used to determine the
+        tma_event : `lsst.summit.utils.efdUtils.TmaEvent`, optional
+            The tma_event to query. If specified, this is used to determine the
             begin and end times, and all other options are disallowed.
         exp_record : ``lsst.daf.butler.dimensions.DimensionRecord``, optional
             The exposure record containing the timespan to query. If specified
@@ -1611,7 +1611,7 @@ class EfdClient(_EfdClientStatic):
 
         """
         begin, end = get_begin_end(
-            day_obs, begin, end, timespan, event, exp_record
+            day_obs, begin, end, timespan, tma_event, exp_record
         )
         begin -= TimeDelta(pre_padding, format="sec")
         end += TimeDelta(post_padding, format="sec")

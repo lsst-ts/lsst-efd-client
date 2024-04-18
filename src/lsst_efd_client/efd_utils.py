@@ -361,7 +361,7 @@ def get_begin_end(
     begin=None,
     end=None,
     timespan=None,
-    event=None,
+    tma_event=None,
     exp_record=None,
 ):
     """Calculate the begin and end times to pass to _getEfdData, given the
@@ -381,8 +381,8 @@ def get_begin_end(
     timespan : `astropy.time.TimeDelta`
         The timespan for the query. If specified, a begin time must also be
         supplied.
-    event : `tmaEvent`
-        The event to query. If specified, this is used to determine the begin
+    tma_event : `lsst.summit.utils.efdUtils.TmaEvent`
+        The tma_event to query. If specified, this is used to determine the begin
         and end times, and all other options are disallowed.
     exp_record : `lsst.daf.butler.dimensions.DimensionRecord`
         The exposure record containing the timespan to query. If specified, all
@@ -396,7 +396,7 @@ def get_begin_end(
         The end time for the query.
     """
     if exp_record is not None:
-        forbiddenOpts = [event, begin, end, timespan, day_obs]
+        forbiddenOpts = [tma_event, begin, end, timespan, day_obs]
         if any(x is not None for x in forbiddenOpts):
             raise ValueError(
                 "You can't specify both an expRecord and a "
@@ -406,15 +406,15 @@ def get_begin_end(
         end = exp_record.timespan.end
         return begin, end
 
-    if event is not None:
+    if tma_event is not None:
         forbiddenOpts = [begin, end, timespan, day_obs]
         if any(x is not None for x in forbiddenOpts):
             raise ValueError(
                 "You can't specify both an event and a "
                 "begin/end or timespan or dayObs"
             )
-        begin = event.begin
-        end = event.end
+        begin = tma_event.begin
+        end = tma_event.end
         return begin, end
 
     # check for dayObs, and that other options aren't inconsistently specified
