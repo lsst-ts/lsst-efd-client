@@ -1,0 +1,3 @@
+setupRequired(ts_utils)
+
+envPrepend(PYTHONPATH, ${PRODUCT_DIR}/python)
