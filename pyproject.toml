@@ -62,10 +62,7 @@ build-backend = "setuptools.build_meta"
 version = { attr = "setuptools_scm.get_version" }
 
 [tool.setuptools.packages.find]
-where = [ "python" ]
-
-[project.scripts]
-run_lsst-efd-client = "src.lsst_efd_client:run_lsst-efd-client"
+where = [ "src" ]
 
 [tool.setuptools_scm]
 
