@@ -1,2 +1,2 @@
 @Library('JenkinsShared')_
-CondaPipeline([], "ts-lsst-efd-client", "src.lsst-efd-client", "noarch")
+CondaPipeline([], "lsst-efd-client", "src.lsst-efd-client", "noarch")
