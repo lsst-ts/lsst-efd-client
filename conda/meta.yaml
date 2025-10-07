@@ -1,0 +1,45 @@
+{% set data= load_setup_py_data() %}
+
+package:
+    name: ts-lsst-efd-client
+    version: {{ data.get('version') }}
+
+source:
+    path: ../
+
+build:
+    noarch: python
+    script: {{ PYTHON }} -m pip install --no-deps --ignore-installed .
+
+test:
+    requires:
+        - ts-conda-build =0.4
+    source_files:
+        - pyproject.toml
+        - python
+        - tests
+    commands:
+        - pytest
+
+requirements:
+    host:
+        - pip
+        - python {{ python }}
+        - setuptools
+        - setuptools_scm
+    build:
+        - python {{ python }}
+        - setuptools
+        - setuptools_scm
+    run:
+        - python {{ python }}
+        - setuptools
+        - setuptools_scm
+        - requests
+        - fastavro
+        - numpy
+        - pandas
+        - astropy
+        - kafkit
+        - aiohttp
+        - aioinflux

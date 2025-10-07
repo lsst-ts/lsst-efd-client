@@ -2,6 +2,12 @@
 
 <!-- scriv-insert-here -->
 
+## 0.13.2 (2025-10-06)
+
+### New features
+
+- Adding conda packaging according to telescope and site standards.
+
 ## 0.13.1 (2023-07-01)
 
 ### Bug fixes

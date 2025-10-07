@@ -43,11 +43,12 @@ dev = [
     "mypy",
     # Documentation
     "documenteer[guide]",
+    "documenteer[pipelines]",
 ]
 
 [project.urls]
 Homepage = "https://efd-client.lsst.io"
-Source = "https://github.com/lsst-sqre/lsst-efd-client"
+Source = "https://github.com/lsst-ts/lsst-efd-client"
 
 [build-system]
 requires = [
@@ -56,6 +57,12 @@ requires = [
     "setuptools_scm[toml]>=6.2"
 ]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.dynamic]
+version = { attr = "setuptools_scm.get_version" }
+
+[tool.setuptools.packages.find]
+where = [ "src" ]
 
 [tool.setuptools_scm]
 
