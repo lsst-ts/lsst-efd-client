@@ -253,8 +253,8 @@ async def test_parse_schema():
     schema = await client.get_schema_by_subject("schema1")
     result = EfdClientTools.parse_schema("schema1", schema)
     assert isinstance(result, pd.DataFrame)
-    for i, l in enumerate("abcd"):
-        assert result["name"][i] == l
+    for i, name in enumerate("abcd"):
+        assert result["name"][i] == name
     for i in range(4):
         assert result["description"][i] == f"Description {i+1}"
     assert "units" in result.columns
