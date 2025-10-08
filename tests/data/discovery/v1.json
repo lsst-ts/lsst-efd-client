@@ -1,0 +1,83 @@
+{
+  "datasets": {
+    "dp02": {
+      "butler_config": "https://data.example.com/api/butler/repo/dp02/butler.yaml"
+    },
+    "dp03": {},
+    "dp1": {
+      "butler_config": "https://data.example.com/api/butler/repo/dp1/butler.yaml"
+    }
+  },
+  "influxdb_databases": {
+    "idfdev_efd": {
+      "url": "https://data.example.com/influxdb/",
+      "database": "efd",
+      "schema_registry": "http://sasquatch-schema-registry.sasquatch:8081/",
+      "credentials_url": "https://example.com/repertoire/discovery/influxdb/idfdev_efd"
+    },
+    "idfdev_metrics": {
+      "url": "https://data.example.com/influxdb/",
+      "database": "lsst.square.metrics",
+      "schema_registry": "http://sasquatch-schema-registry.sasquatch:8081/",
+      "credentials_url": "https://example.com/repertoire/discovery/influxdb/idfdev_metrics"
+    }
+  },
+  "services": {
+    "data": {
+      "cutout": {
+        "dp02": {
+          "url": "https://data.example.com/api/cutout",
+          "versions": {
+            "soda-async-1.0": {
+              "url": "https://data.example.com/api/cutout/dp02/jobs"
+            },
+            "soda-sync-1.0": {
+              "url": "https://data.example.com/api/cutout/dp02/sync"
+            }
+          }
+        },
+        "dp03": {
+          "url": "https://data.example.com/api/cutout",
+          "versions": {
+            "soda-async-1.0": {
+              "url": "https://data.example.com/api/cutout/dp03/jobs"
+            },
+            "soda-sync-1.0": {
+              "url": "https://data.example.com/api/cutout/dp03/sync"
+            }
+          }
+        },
+        "dp1": {
+          "url": "https://data.example.com/api/cutout",
+          "versions": {
+            "soda-async-1.0": {
+              "url": "https://data.example.com/api/cutout/dp1/jobs"
+            },
+            "soda-sync-1.0": {
+              "url": "https://data.example.com/api/cutout/dp1/sync"
+            }
+          }
+        }
+      },
+      "sia": {
+        "dp02": {
+          "url": "https://data.example.com/api/sia/dp02"
+        },
+        "dp1": {
+          "url": "https://data.example.com/api/sia/dp1"
+        }
+      },
+      "tap": {
+        "dp02": {
+          "url": "https://data.example.com/api/tap"
+        },
+        "dp03": {
+          "url": "https://data.example.com/api/ssotap"
+        },
+        "dp1": {
+          "url": "https://data.example.com/api/tap"
+        }
+      }
+    }
+  }
+}

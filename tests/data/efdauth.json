@@ -1,0 +1,9 @@
+{
+  "idfdev_efd": {
+    "url": "https://data.example.com/influxdb/",
+    "database": "efd",
+    "username": "efdreader",
+    "password": "some-password",
+    "schema_registry": "http://sasquatch-schema-registry.sasquatch:8081/"
+  }
+}
