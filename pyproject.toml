@@ -38,12 +38,15 @@ dynamic = ["version"]
 dev = [
     # Testing
     "coverage[toml]",
+    "httpx",
+    "lsst-rsp>=0.10",
     "pytest",
     "pytest-asyncio",
     "pytest-vcr",
     "pre-commit",
     "mypy",
     "requests",
+    "respx",
     # Documentation
     "documenteer[guide]",
     "documenteer[pipelines]",
