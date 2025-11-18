@@ -50,7 +50,9 @@ async def make_efd_client():
         efd_client = EfdClient("test_efd", db_name="client_test", client=client)
         # Monkey patch the client to point to an existing schema registry
         # Note this is only available if on the NCSA VPN
-        efd_client.schema_registry = "https://lsst-schema-registry-efd.ncsa.illinois.edu"
+        efd_client.schema_registry = (
+            "https://lsst-schema-registry-efd.ncsa.illinois.edu"
+        )
         try:
             yield efd_client
         finally:
@@ -72,7 +74,9 @@ def make_synchronous_efd_client():
         efd_client = EfdClientSync("test_efd", db_name="client_test", client=client)
         # Monkey patch the client to point to an existing schema registry
         # Note this is only available if on the NCSA VPN
-        efd_client.schema_registry = "https://lsst-schema-registry-efd.ncsa.illinois.edu"
+        efd_client.schema_registry = (
+            "https://lsst-schema-registry-efd.ncsa.illinois.edu"
+        )
         try:
             yield efd_client
         finally:
@@ -392,7 +396,9 @@ async def test_time_series(start_stop, start_stop_old):
 @safe_vcr.use_cassette()
 async def test_top_n(start_stop):
     async with make_efd_client() as efd_client:
-        df = await efd_client.select_top_n("lsst.sal.fooSubSys.test", ["foo", "bar"], 10)
+        df = await efd_client.select_top_n(
+            "lsst.sal.fooSubSys.test", ["foo", "bar"], 10
+        )
         assert len(df) == 10
         for c in ["foo", "bar"]:
             assert c in df.columns

@@ -29,7 +29,8 @@ class NotebookAuth:
             self.service_endpoint = service_endpoint
         else:
             raise RuntimeError(
-                f"Credential service at {service_endpoint} failed with Error {response.status_code}."
+                f"""Credential service at {service_endpoint} \
+                failed with Error {response.status_code}."""
             )
 
     def get_auth(self, alias):
@@ -59,7 +60,8 @@ class NotebookAuth:
             )
         elif response.status_code == 404:
             raise ValueError(
-                f"No credentials available for {alias}. Try list_auth to get a list of available keys."
+                f"""No credentials available for {alias}. \
+                Try list_auth to get a list of available keys."""
             )
         else:
             raise RuntimeError(f"Server returned {response.status_code}.")

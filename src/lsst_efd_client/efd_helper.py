@@ -75,7 +75,9 @@ class _EfdClientStatic:
             Raised if there is no subclass corresponding to the name.
         """
         if efd_name not in self.subclasses:
-            raise NotImplementedError(f"There is no EFD client class implemented for {efd_name}.")
+            raise NotImplementedError(
+                f"There is no EFD client class implemented for {efd_name}."
+            )
         return self.subclasses[efd_name](efd_name, *args, **kwargs)
 
 
@@ -179,13 +181,17 @@ class EfdClientTools:
             start_str = start.isot
             end_str = end.isot
         else:
-            raise TypeError("The second time argument must be the time stamp for the end or a time delta.")
+            raise TypeError(
+                "The second time argument must be the \
+                time stamp for the end or a time delta."
+            )
 
         index_str = ""
         if index:
             if use_old_csc_indexing:
                 parts = topic_name.split(".")
-                index_name = f"{parts[-2]}ID"  # The CSC name is always the penultimate
+                index_name = f"{parts[-2]}ID"
+                # The CSC name is always the penultimate
             else:
                 index_name = "salIndex"
             index_str = f" AND {index_name} = {index}"
@@ -203,9 +209,12 @@ class EfdClientTools:
             fields = [
                 fields,
             ]
-
         # Build query here
-        return f'SELECT {", ".join(fields)} FROM "{db_name}"."autogen"."{topic_name}" WHERE {timespan}'
+        query = f'''SELECT {", ".join(fields)} \
+            FROM "{db_name}"."autogen"."{topic_name}" \
+            WHERE {timespan}'''.replace("\n", "")
+
+        return query
 
     @staticmethod
     def build_select_top_n_query(
@@ -250,7 +259,9 @@ class EfdClientTools:
             ]
 
         # Build query here
-        query = f'SELECT {", ".join(fields)} FROM "{db_name}"."autogen"."{topic_name}"{pstr} {limit}'
+        query = f'''SELECT {", ".join(fields)} \
+                FROM "{db_name}"."autogen"."{topic_name}"{pstr} \
+                {limit}'''.replace("\n", "")
         return query
 
     @staticmethod
@@ -261,12 +272,17 @@ class EfdClientTools:
         n = None
         for bfield in base_fields:
             for f in fields:
-                if f.startswith(bfield) and f[len(bfield) :].isdigit():  # Check prefix is complete
+                if (
+                    f.startswith(bfield) and f[len(bfield) :].isdigit()
+                ):  # Check prefix is complete
                     ret.setdefault(bfield, []).append(f)
             if n is None:
                 n = len(ret[bfield])
             if n != len(ret[bfield]):
-                raise ValueError(f"Field lengths do not agree for {bfield}: {n} vs. {len(ret[bfield])}")
+                raise ValueError(
+                    f"""Field lengths do not agree for {bfield}: \
+                    {n} vs. {len(ret[bfield])}"""
+                )
 
             def sorter(prefix, val):
                 return int(val[len(prefix) :])
@@ -335,7 +351,10 @@ class EfdClientTools:
             if "units" in f:
                 vals["units"].append(f["units"])
                 # Special case not having units
-                if vals["units"][-1] == "unitless" or vals["units"][-1] == "dimensionless":
+                if (
+                    vals["units"][-1] == "unitless"
+                    or vals["units"][-1] == "dimensionless"
+                ):
                     vals["aunits"].append(u.dimensionless_unscaled)
                 else:
                     vals["aunits"].append(u.Unit(vals["units"][-1]))
@@ -438,7 +457,9 @@ class EfdClientSync(_EfdClientStatic):
         """
         self._query_history.append(query)
         result = self._influx_client.query(query)
-        return EfdClientTools.handle_query_result(result, convert_influx_index=convert_influx_index)
+        return EfdClientTools.handle_query_result(
+            result, convert_influx_index=convert_influx_index
+        )
 
     def get_topics(self):
         """Query the list of possible topics.
@@ -464,7 +485,9 @@ class EfdClientSync(_EfdClientStatic):
         results : `list`
             List of field names in specified topic.
         """
-        fields = self._do_query(f'SHOW FIELD KEYS FROM "{self._db_name}"."autogen"."{topic_name}"')
+        fields = self._do_query(
+            f'SHOW FIELD KEYS FROM "{self._db_name}"."autogen"."{topic_name}"'
+        )
         return fields["fieldKey"].tolist()
 
     @property
@@ -811,7 +834,9 @@ class EfdClient(_EfdClientStatic):
         (
             self._schema_registry_url,
             self._influx_client,
-        ) = EfdClientTools.get_client(efd_name, EfdClient.mode, db_name, creds_service, timeout, client)
+        ) = EfdClientTools.get_client(
+            efd_name, EfdClient.mode, db_name, creds_service, timeout, client
+        )
         self._db_name = db_name
         self._query_history = []
 
@@ -819,7 +844,9 @@ class EfdClient(_EfdClientStatic):
         #  Helper function to do influxdb queries.
         self._query_history.append(query)
         result = await self._influx_client.query(query)
-        return EfdClientTools.handle_query_result(result, convert_influx_index=convert_influx_index)
+        return EfdClientTools.handle_query_result(
+            result, convert_influx_index=convert_influx_index
+        )
 
     async def get_topics(self):
         """Query the list of possible topics.
@@ -845,7 +872,9 @@ class EfdClient(_EfdClientStatic):
         results : `list`
             List of field names in specified topic.
         """
-        fields = await self._do_query(f'SHOW FIELD KEYS FROM "{self._db_name}"."autogen"."{topic_name}"')
+        fields = await self._do_query(
+            f'SHOW FIELD KEYS FROM "{self._db_name}"."autogen"."{topic_name}"'
+        )
         return fields["fieldKey"].tolist()
 
     @property
