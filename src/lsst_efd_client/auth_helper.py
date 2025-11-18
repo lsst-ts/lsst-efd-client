@@ -1,5 +1,4 @@
-"""Authentication helpers
-"""
+"""Authentication helpers"""
 
 from urllib.parse import urljoin
 
@@ -24,16 +23,13 @@ class NotebookAuth:
         Raised if the service returns a non-200 status code.
     """
 
-    def __init__(
-        self, service_endpoint="https://roundtable.lsst.codes/segwarides/"
-    ):
+    def __init__(self, service_endpoint="https://roundtable.lsst.codes/segwarides/"):
         response = requests.get(service_endpoint)
         if response.status_code == 200:
             self.service_endpoint = service_endpoint
         else:
             raise RuntimeError(
-                f"Credential service at {service_endpoint} failed with Error "
-                f"{response.status_code}."
+                f"Credential service at {service_endpoint} failed with Error {response.status_code}."
             )
 
     def get_auth(self, alias):
@@ -50,9 +46,7 @@ class NotebookAuth:
             A tuple containing the host name, schema registry, port,
             username, password and path.
         """
-        response = requests.get(
-            urljoin(self.service_endpoint, f"creds/{alias}")
-        )
+        response = requests.get(urljoin(self.service_endpoint, f"creds/{alias}"))
         if response.status_code == 200:
             data = response.json()
             return (
@@ -65,8 +59,7 @@ class NotebookAuth:
             )
         elif response.status_code == 404:
             raise ValueError(
-                f"No credentials available for {alias}. "
-                "Try list_auth to get a list of available keys."
+                f"No credentials available for {alias}. Try list_auth to get a list of available keys."
             )
         else:
             raise RuntimeError(f"Server returned {response.status_code}.")

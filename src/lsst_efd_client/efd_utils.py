@@ -56,19 +56,12 @@ def merge_packed_time_series(
     """
 
     packed_fields = [
-        k
-        for k in packed_dataframe.keys()
-        if k.startswith(base_field) and k[len(base_field) :].isdigit()
+        k for k in packed_dataframe.keys() if k.startswith(base_field) and k[len(base_field) :].isdigit()
     ]
-    packed_fields = sorted(
-        packed_fields, key=lambda k: int(k[len(base_field) :])
-    )  # sort by pack ID
+    packed_fields = sorted(packed_fields, key=lambda k: int(k[len(base_field) :]))  # sort by pack ID
     npack = len(packed_fields)
     if npack % stride != 0:
-        raise RuntimeError(
-            "Stride must be a factor of the number of packed fields: "
-            f"{stride} v. {npack}"
-        )
+        raise RuntimeError(f"Stride must be a factor of the number of packed fields: {stride} v. {npack}")
     packed_len = len(packed_dataframe)
     n_used = npack // stride  # number of raw fields being used
     output = np.empty(n_used * packed_len)
@@ -77,19 +70,14 @@ def merge_packed_time_series(
     if packed_len == 1:
         dt = 0
     else:
-        dt = (
-            packed_dataframe[ref_timestamp_col][1]
-            - packed_dataframe[ref_timestamp_col][0]
-        ) / npack
+        dt = (packed_dataframe[ref_timestamp_col][1] - packed_dataframe[ref_timestamp_col][0]) / npack
     for i in range(0, npack, stride):
         i0 = i // stride
         output[i0::n_used] = packed_dataframe[f"{base_field}{i}"]
         times[i0::n_used] = packed_dataframe[ref_timestamp_col] + i * dt
 
     timestamps = Time(times, format=fmt, scale=scale)
-    return pd.DataFrame(
-        {base_field: output, "times": times}, index=timestamps.utc.datetime64
-    )
+    return pd.DataFrame({base_field: output, "times": times}, index=timestamps.utc.datetime64)
 
 
 def resample(df1, df2, interp_type="time"):
@@ -111,9 +99,7 @@ def resample(df1, df2, interp_type="time"):
         That is the length of the resulting `~pandas.DataFrame` is the
         sum of the lengths of the inputs.
     """
-    df = pd.concat(
-        [df1, df2], axis=1
-    )  # Sort in this context does not sort the data
+    df = pd.concat([df1, df2], axis=1)  # Sort in this context does not sort the data
     df = df.sort_index()
     return df.interpolate(type=interp_type)
 
@@ -183,14 +169,10 @@ class SyncSchemaParser:
     def _request(
         self, method: str, url: str, headers: Mapping[str, str], body: bytes
     ) -> tuple[int, Mapping[str, str], bytes]:
-        with self._session.request(
-            method, url, headers=headers, data=body
-        ) as response:
+        with self._session.request(method, url, headers=headers, data=body) as response:
             return response.status_code, response.headers, response.content
 
-    def _make_request(
-        self, method: str, url: str, url_vars: Mapping[str, str], data: Any
-    ) -> Any:
+    def _make_request(self, method: str, url: str, url_vars: Mapping[str, str], data: Any) -> Any:
         """Construct and make an HTTP request."""
         expanded_url = format_url(host=self._url, url=url, url_vars=url_vars)
         request_headers = make_headers()
@@ -201,9 +183,7 @@ class SyncSchemaParser:
         else:
             charset = "utf-8"
             body = json.dumps(data).encode(charset)
-            request_headers[
-                "content-type"
-            ] = f"application/json; charset={charset}"
+            request_headers["content-type"] = f"application/json; charset={charset}"
             request_headers["content-length"] = str(len(body))
 
         response = self._request(method, expanded_url, request_headers, body)
@@ -243,9 +223,7 @@ class SyncSchemaParser:
             url_vars = {}
         return self._make_request("GET", url, url_vars, b"")
 
-    def get_schema_by_subject(
-        self, subject: str, version: str | int = "latest"
-    ) -> dict[str, Any]:
+    def get_schema_by_subject(self, subject: str, version: str | int = "latest") -> dict[str, Any]:
         """Get a schema for a subject in the registry.
 
         Wraps ``GET /subjects/(string: subject)/versions/(versionId: version)``
