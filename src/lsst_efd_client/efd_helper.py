@@ -43,9 +43,7 @@ class _EfdClientStatic:
         _EfdClientStatic.subclasses[cls.deployment] = cls
 
     @classmethod
-    def list_efd_names(
-        cls, creds_service="https://roundtable.lsst.codes/segwarides/"
-    ):
+    def list_efd_names(cls, creds_service="https://roundtable.lsst.codes/segwarides/"):
         """List all valid names for EFD deployments available.
 
         Parameters
@@ -184,17 +182,16 @@ class EfdClientTools:
             end_str = end.isot
         else:
             raise TypeError(
-                "The second time argument must be the time stamp for the end "
-                "or a time delta."
+                "The second time argument must be the \
+                time stamp for the end or a time delta."
             )
 
         index_str = ""
         if index:
             if use_old_csc_indexing:
                 parts = topic_name.split(".")
-                index_name = (
-                    f"{parts[-2]}ID"  # The CSC name is always the penultimate
-                )
+                index_name = f"{parts[-2]}ID"
+                # The CSC name is always the penultimate
             else:
                 index_name = "salIndex"
             index_str = f" AND {index_name} = {index}"
@@ -212,12 +209,12 @@ class EfdClientTools:
             fields = [
                 fields,
             ]
-
         # Build query here
-        return (
-            f'SELECT {", ".join(fields)} FROM "{db_name}"."autogen".'
-            f'"{topic_name}" WHERE {timespan}'
-        )
+        query = f'''SELECT {", ".join(fields)} \
+            FROM "{db_name}"."autogen"."{topic_name}" \
+            WHERE {timespan}'''.replace("\n", "")
+
+        return query
 
     @staticmethod
     def build_select_top_n_query(
@@ -241,9 +238,7 @@ class EfdClientTools:
         if index:
             if use_old_csc_indexing:
                 parts = topic_name.split(".")
-                index_name = (
-                    f"{parts[-2]}ID"  # The CSC name is always the penultimate
-                )
+                index_name = f"{parts[-2]}ID"  # The CSC name is always the penultimate
             else:
                 index_name = "salIndex"
             # The CSC name is always the penultimate
@@ -264,10 +259,9 @@ class EfdClientTools:
             ]
 
         # Build query here
-        query = (
-            f'SELECT {", ".join(fields)} FROM "{db_name}"."autogen".'
-            f'"{topic_name}"{pstr} {limit}'
-        )
+        query = f'''SELECT {", ".join(fields)} \
+                FROM "{db_name}"."autogen"."{topic_name}"{pstr} \
+                {limit}'''.replace("\n", "")
         return query
 
     @staticmethod
@@ -286,8 +280,8 @@ class EfdClientTools:
                 n = len(ret[bfield])
             if n != len(ret[bfield]):
                 raise ValueError(
-                    f"Field lengths do not agree for {bfield}: {n} vs. "
-                    f"{len(ret[bfield])}"
+                    f"""Field lengths do not agree for {bfield}: \
+                    {n} vs. {len(ret[bfield])}"""
                 )
 
             def sorter(prefix, val):
@@ -492,8 +486,7 @@ class EfdClientSync(_EfdClientStatic):
             List of field names in specified topic.
         """
         fields = self._do_query(
-            f'SHOW FIELD KEYS FROM "{self._db_name}"'
-            f'."autogen"."{topic_name}"'
+            f'SHOW FIELD KEYS FROM "{self._db_name}"."autogen"."{topic_name}"'
         )
         return fields["fieldKey"].tolist()
 
@@ -880,8 +873,7 @@ class EfdClient(_EfdClientStatic):
             List of field names in specified topic.
         """
         fields = await self._do_query(
-            f'SHOW FIELD KEYS FROM "{self._db_name}"'
-            f'."autogen"."{topic_name}"'
+            f'SHOW FIELD KEYS FROM "{self._db_name}"."autogen"."{topic_name}"'
         )
         return fields["fieldKey"].tolist()
 
