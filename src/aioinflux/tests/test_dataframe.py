@@ -116,7 +116,6 @@ async def test_serialize_float():
 
     for type_ in [
         float,
-        np.float,
         np.float16,
         np.float32,
         np.float64,

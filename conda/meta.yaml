@@ -23,7 +23,6 @@ test:
         - astropy
         - kafkit
         - aiohttp
-        - aioinflux
     source_files:
         - pyproject.toml
         - src
@@ -52,4 +51,3 @@ requirements:
         - astropy
         - kafkit
         - aiohttp
-        - aioinflux
