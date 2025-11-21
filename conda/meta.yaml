@@ -23,6 +23,7 @@ test:
         - astropy
         - kafkit
         - aiohttp
+        - ciso8601
     source_files:
         - pyproject.toml
         - src

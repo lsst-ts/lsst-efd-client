@@ -3,7 +3,7 @@ from functools import reduce
 from itertools import chain
 from typing import Union, Dict, List
 
-from compat import np, pd
+from ..compat import np, pd
 
 from .common import escape, key_escape
 
