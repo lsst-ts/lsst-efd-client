@@ -5,7 +5,7 @@ import string
 import uuid
 from itertools import combinations, cycle, islice
 
-from aioinflux.compat import np, pd, no_pandas_warning
+from aioinflux.aioinflux.compat import np, pd, no_pandas_warning
 
 import pytest
 

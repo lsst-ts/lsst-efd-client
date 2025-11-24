@@ -1,11 +1,11 @@
 import pytest
-from aioinflux import (
+from aioinflux.aioinflux import (
     InfluxDBClient,
     InfluxDBError,
     InfluxDBWriteError,
     iterpoints,
 )
-from aioinflux.compat import pd
+from aioinflux.aioinflux.compat import pd
 import testing_utils as utils
 from testing_utils import logger
 

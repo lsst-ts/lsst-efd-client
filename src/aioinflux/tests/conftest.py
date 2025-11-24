@@ -2,7 +2,7 @@ import asyncio
 
 import pytest
 
-from aioinflux import InfluxDBClient
+from aioinflux.aioinflux import InfluxDBClient
 import testing_utils as utils
 
 

@@ -9,8 +9,8 @@ from decimal import Decimal
 
 import pytest
 
-import aioinflux
-from aioinflux import lineprotocol, SchemaError
+import aioinflux.aioinflux as aioinflux
+from aioinflux.aioinflux import lineprotocol, SchemaError
 from testing_utils import logger
 
 
