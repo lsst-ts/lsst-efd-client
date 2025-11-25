@@ -119,7 +119,7 @@ async def test_serialize_float():
         np.float16,
         np.float32,
         np.float64,
-        np.float128,
+        np.longdouble,
     ]:
         df = pd.DataFrame([{"a": 3.5}], index=[datetime.now()], dtype=type_)
         res = serialize(df, measurement="test_serialize")

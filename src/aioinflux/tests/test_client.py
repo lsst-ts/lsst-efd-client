@@ -10,7 +10,8 @@ import testing_utils as utils
 from testing_utils import logger
 
 
-def test_repr(client):
+@pytest.mark.asyncio
+async def test_repr(client):
     logger.info(client)
 
 
@@ -295,7 +296,8 @@ def test_no_default_database_warning():
     logger.error(e)
 
 
-def test_invalid_output_format(client):
+@pytest.mark.asyncio
+async def test_invalid_output_format(client):
     with pytest.raises(ValueError) as e:
         client.output = utils.random_string()
     logger.error(e)

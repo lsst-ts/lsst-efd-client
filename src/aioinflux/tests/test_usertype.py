@@ -1,7 +1,7 @@
 # flake8: noqa
 import uuid
 import enum
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import NamedTuple, Optional
 from collections import namedtuple
 from dataclasses import dataclass
@@ -90,7 +90,7 @@ def test_datetime():
         users=aioinflux.INT,
     )
     MyPoint = lineprotocol(namedtuple("MyPoint", schema.keys()), schema=schema)
-    p = MyPoint("a", datetime.utcnow(), "b", False, 5)
+    p = MyPoint("a", datetime.now(timezone.utc), "b", False, 5)
     logger.debug(p.to_lineprotocol())
     assert isinstance(p.to_lineprotocol(), bytes)
 
