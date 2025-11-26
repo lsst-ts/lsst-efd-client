@@ -1,5 +1,4 @@
 test:
-	flake8
 	pytest --verbose --cov=aioinflux --cov-append --cov-report html --cov-report term tests/
 
 cov: test

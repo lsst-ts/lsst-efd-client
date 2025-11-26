@@ -44,6 +44,7 @@ dev = [
     "pytest-vcr",
     "pre-commit",
     "mypy",
+    "requests",
     # Documentation
     "documenteer[guide]",
     "documenteer[pipelines]",
