@@ -25,6 +25,7 @@ test:
         - aiohttp
         - ciso8601
         - pytest-cov
+        - pytest-asyncio
     source_files:
         - pyproject.toml
         - src
