@@ -23,7 +23,9 @@ test:
         - astropy
         - kafkit
         - aiohttp
-        - aioinflux
+        - ciso8601
+        - pytest-cov
+        - pytest-asyncio
     source_files:
         - pyproject.toml
         - src
@@ -52,4 +54,3 @@ requirements:
         - astropy
         - kafkit
         - aiohttp
-        - aioinflux
