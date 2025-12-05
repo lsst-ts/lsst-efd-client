@@ -12,7 +12,6 @@ import vcr
 from astropy.time import Time, TimeDelta
 from kafkit.registry.sansio import MockRegistryApi
 
-from aioinflux.aioinflux import InfluxDBClient
 from lsst_efd_client import (
     EfdClient,
     EfdClientSync,
@@ -21,6 +20,7 @@ from lsst_efd_client import (
     resample,
 )
 from lsst_efd_client.efd_helper import EfdClientTools
+from lsst_efd_client.aioinflux import InfluxDBClient
 
 PATH = pathlib.Path(__file__).parent.absolute()
 
