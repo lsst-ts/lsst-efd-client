@@ -1,9 +1,3 @@
-# flake8: noqa
-from aioinflux.aioinflux import serialization
-from aioinflux.aioinflux.client import InfluxDBClient, InfluxDBError, InfluxDBWriteError
-from aioinflux.aioinflux.iterutils import iterpoints
-from aioinflux.aioinflux.serialization.usertype import *
-
 """Collection of EFD utilities."""
 
 import importlib.metadata
