@@ -6,13 +6,13 @@ from typing import Any
 from urllib.parse import urljoin
 
 import aiohttp
-import aioinflux
 import astropy.units as u
 import pandas as pd
 import requests
 from astropy.time import Time, TimeDelta
 from kafkit.registry.aiohttp import RegistryApi
 
+from . import aioinflux
 from .auth_helper import NotebookAuth
 from .efd_utils import SyncSchemaParser, merge_packed_time_series
 
@@ -43,9 +43,7 @@ class _EfdClientStatic:
         _EfdClientStatic.subclasses[cls.deployment] = cls
 
     @classmethod
-    def list_efd_names(
-        cls, creds_service="https://roundtable.lsst.codes/segwarides/"
-    ):
+    def list_efd_names(cls, creds_service="https://roundtable.lsst.codes/segwarides/"):
         """List all valid names for EFD deployments available.
 
         Parameters
@@ -192,9 +190,7 @@ class EfdClientTools:
         if index:
             if use_old_csc_indexing:
                 parts = topic_name.split(".")
-                index_name = (
-                    f"{parts[-2]}ID"  # The CSC name is always the penultimate
-                )
+                index_name = f"{parts[-2]}ID"  # The CSC name is always the penultimate
             else:
                 index_name = "salIndex"
             index_str = f" AND {index_name} = {index}"
@@ -241,9 +237,7 @@ class EfdClientTools:
         if index:
             if use_old_csc_indexing:
                 parts = topic_name.split(".")
-                index_name = (
-                    f"{parts[-2]}ID"  # The CSC name is always the penultimate
-                )
+                index_name = f"{parts[-2]}ID"  # The CSC name is always the penultimate
             else:
                 index_name = "salIndex"
             # The CSC name is always the penultimate
@@ -492,8 +486,7 @@ class EfdClientSync(_EfdClientStatic):
             List of field names in specified topic.
         """
         fields = self._do_query(
-            f'SHOW FIELD KEYS FROM "{self._db_name}"'
-            f'."autogen"."{topic_name}"'
+            f'SHOW FIELD KEYS FROM "{self._db_name}"."autogen"."{topic_name}"'
         )
         return fields["fieldKey"].tolist()
 
@@ -880,8 +873,7 @@ class EfdClient(_EfdClientStatic):
             List of field names in specified topic.
         """
         fields = await self._do_query(
-            f'SHOW FIELD KEYS FROM "{self._db_name}"'
-            f'."autogen"."{topic_name}"'
+            f'SHOW FIELD KEYS FROM "{self._db_name}"."autogen"."{topic_name}"'
         )
         return fields["fieldKey"].tolist()
 

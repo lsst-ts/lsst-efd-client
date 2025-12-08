@@ -111,9 +111,7 @@ def resample(df1, df2, interp_type="time"):
         That is the length of the resulting `~pandas.DataFrame` is the
         sum of the lengths of the inputs.
     """
-    df = pd.concat(
-        [df1, df2], axis=1
-    )  # Sort in this context does not sort the data
+    df = pd.concat([df1, df2], axis=1)  # Sort in this context does not sort the data
     df = df.sort_index()
     return df.interpolate(type=interp_type)
 
@@ -183,9 +181,7 @@ class SyncSchemaParser:
     def _request(
         self, method: str, url: str, headers: Mapping[str, str], body: bytes
     ) -> tuple[int, Mapping[str, str], bytes]:
-        with self._session.request(
-            method, url, headers=headers, data=body
-        ) as response:
+        with self._session.request(method, url, headers=headers, data=body) as response:
             return response.status_code, response.headers, response.content
 
     def _make_request(
@@ -201,9 +197,7 @@ class SyncSchemaParser:
         else:
             charset = "utf-8"
             body = json.dumps(data).encode(charset)
-            request_headers[
-                "content-type"
-            ] = f"application/json; charset={charset}"
+            request_headers["content-type"] = f"application/json; charset={charset}"
             request_headers["content-length"] = str(len(body))
 
         response = self._request(method, expanded_url, request_headers, body)
