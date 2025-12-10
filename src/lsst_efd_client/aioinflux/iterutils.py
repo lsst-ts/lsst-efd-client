@@ -1,6 +1,5 @@
 import inspect
-
-from typing import Optional, Generator, Callable
+from typing import Callable, Generator, Optional
 
 
 def iterpoints(resp: dict, parser: Optional[Callable] = None) -> Generator:

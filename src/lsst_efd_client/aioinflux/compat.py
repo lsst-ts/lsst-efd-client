@@ -4,8 +4,8 @@ no_pandas_warning = "Pandas/Numpy is not available. \
                     Support for 'dataframe' mode is disabled."
 
 try:
-    import pandas as pd
     import numpy as np
+    import pandas as pd
 except ModuleNotFoundError:
     pd = None
     np = None

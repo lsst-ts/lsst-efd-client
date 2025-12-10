@@ -4,11 +4,11 @@ from typing import Mapping
 import ciso8601
 
 from .common import (
-    key_escape,
-    tag_escape,
-    str_escape,
-    measurement_escape,
     escape,
+    key_escape,
+    measurement_escape,
+    str_escape,
+    tag_escape,
 )
 
 

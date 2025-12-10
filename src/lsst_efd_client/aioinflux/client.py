@@ -4,19 +4,19 @@ import logging
 import warnings
 from functools import wraps
 from typing import (
+    AnyStr,
+    AsyncGenerator,
+    Iterable,
+    Mapping,
+    Optional,
     TypeVar,
     Union,
-    AnyStr,
-    Mapping,
-    Iterable,
-    Optional,
-    AsyncGenerator,
 )
 
 import aiohttp
 
 from . import serialization
-from .compat import pd, no_pandas_warning
+from .compat import no_pandas_warning, pd
 
 if pd:
     PointType = TypeVar("PointType", Mapping, dict, bytes, pd.DataFrame)
@@ -56,8 +56,7 @@ class InfluxDBWriteError(InfluxDBError):
         self.headers = resp.headers
         self.reason = resp.reason
         super().__init__(
-            f"Error writing data ({self.status} - {self.reason}): "
-            f"{self.headers.get('X-Influxdb-Error', '')}"
+            f"Error writing data ({self.status} - {self.reason}): {self.headers.get('X-Influxdb-Error', '')}"
         )
 
 
@@ -196,10 +195,7 @@ class InfluxDBClient:
     def db(self, db):
         self._db = db
         if not db:
-            warnings.warn(
-                "No default databases is set. "
-                "Database must be specified when querying/writing."
-            )
+            warnings.warn("No default databases is set. Database must be specified when querying/writing.")
 
     def __enter__(self):
         return self
@@ -435,9 +431,7 @@ class InfluxDBClient:
 
     def show_tag_values(self, key, measurement=None):
         if measurement:
-            return self.query(
-                f'SHOW TAG VALUES FROM "{measurement}" WITH key = "{key}"'
-            )
+            return self.query(f'SHOW TAG VALUES FROM "{measurement}" WITH key = "{key}"')
         return self.query(f'SHOW TAG VALUES WITH key = "{key}"')
 
     def show_retention_policies(self):

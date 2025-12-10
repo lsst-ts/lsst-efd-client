@@ -1,15 +1,12 @@
 import re
 from functools import reduce
 from itertools import chain
-from typing import Union, Dict, List
+from typing import Dict, List, Union
 
 from ..compat import np, pd
-
 from .common import escape, key_escape
 
-DataFrameType = Union[
-    pd.DataFrame, Dict[str, pd.DataFrame], List[Dict[str, pd.DataFrame]]
-]
+DataFrameType = Union[pd.DataFrame, Dict[str, pd.DataFrame], List[Dict[str, pd.DataFrame]]]
 
 
 # Serialization helper functions
@@ -129,10 +126,7 @@ def serialize(df, measurement, tag_columns=None, **extra_tags) -> bytes:
     if isnull.any():
         lp = map(f, _itertuples(df[~isnull]))
         rep = _replace(df)
-        lp_nan = (
-            reduce(lambda a, b: re.sub(*b, a), rep, f(p))
-            for p in _itertuples(df[isnull])
-        )
+        lp_nan = (reduce(lambda a, b: re.sub(*b, a), rep, f(p)) for p in _itertuples(df[isnull]))
         return "\n".join(chain(lp, lp_nan)).encode("utf-8")
     else:
         return "\n".join(map(f, _itertuples(df))).encode("utf-8")
