@@ -29,7 +29,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: "3.11"
+          python-version: "3.13"
 
       - name: Run pre-commit
         uses: pre-commit/action@v3.0.1
@@ -42,8 +42,8 @@ jobs:
     strategy:
       matrix:
         python:
-          - "3.10"
-          - "3.11"
+          - "3.12"
+          - "3.13"
 
     steps:
       - uses: actions/checkout@v6
@@ -70,7 +70,7 @@ jobs:
       - name: Run tox
         uses: lsst-sqre/run-tox@v1
         with:
-          python-version: "3.11"
+          python-version: "3.13"
           tox-envs: "docs,docs-linkcheck"
 
       # Only attempt documentation uploads for tagged releases and pull
@@ -102,7 +102,7 @@ jobs:
       - name: Build and publish
         uses: lsst-sqre/build-and-publish-to-pypi@v3
         with:
-          python-version: "3.11"
+          python-version: "3.13"
           upload: "false"
 
   pypi-publish:
@@ -125,5 +125,5 @@ jobs:
       - name: Build and publish
         uses: lsst-sqre/build-and-publish-to-pypi@v3
         with:
-          python-version: "3.11"
+          python-version: "3.13"
           pypi-token: ${{ secrets.PYPI_SQRE_ADMIN }}
