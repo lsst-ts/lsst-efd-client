@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         python:
-          - "3.11"
+          - "3.13"
 
     steps:
       - uses: actions/checkout@v6
@@ -38,7 +38,7 @@ jobs:
       - name: Build docs in tox
         uses: lsst-sqre/run-tox@v1
         with:
-          python-version: "3.11"
+          python-version: "3.13"
           tox-envs: "docs,docs-linkcheck"
           use-cache: false
 
@@ -55,5 +55,5 @@ jobs:
         uses: lsst-sqre/build-and-publish-to-pypi@v3
         with:
           pypi-token: ""
-          python-version: "3.11"
+          python-version: "3.13"
           upload: false
