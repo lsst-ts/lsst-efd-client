@@ -9,7 +9,6 @@ import numpy as np
 import pandas as pd
 import pytest
 import vcr
-from aioinflux import InfluxDBClient
 from astropy.time import Time, TimeDelta
 from kafkit.registry.sansio import MockRegistryApi
 
@@ -20,6 +19,7 @@ from lsst_efd_client import (
     rendezvous_dataframes,
     resample,
 )
+from lsst_efd_client.aioinflux import InfluxDBClient
 from lsst_efd_client.efd_helper import EfdClientTools
 
 PATH = pathlib.Path(__file__).parent.absolute()
@@ -47,14 +47,10 @@ async def make_efd_client():
         await client.create_database()
         await client.write(df, measurement="lsst.sal.fooSubSys.test")
         await client.write(df1, measurement="lsst.sal.barSubSys.test")
-        efd_client = EfdClient(
-            "test_efd", db_name="client_test", client=client
-        )
+        efd_client = EfdClient("test_efd", db_name="client_test", client=client)
         # Monkey patch the client to point to an existing schema registry
         # Note this is only available if on the NCSA VPN
-        efd_client.schema_registry = (
-            "https://lsst-schema-registry-efd.ncsa.illinois.edu"
-        )
+        efd_client.schema_registry = "https://lsst-schema-registry-efd.ncsa.illinois.edu"
         try:
             yield efd_client
         finally:
@@ -73,14 +69,10 @@ def make_synchronous_efd_client():
         client.create_database()
         client.write(df, measurement="lsst.sal.fooSubSys.test")
         client.write(df1, measurement="lsst.sal.barSubSys.test")
-        efd_client = EfdClientSync(
-            "test_efd", db_name="client_test", client=client
-        )
+        efd_client = EfdClientSync("test_efd", db_name="client_test", client=client)
         # Monkey patch the client to point to an existing schema registry
         # Note this is only available if on the NCSA VPN
-        efd_client.schema_registry = (
-            "https://lsst-schema-registry-efd.ncsa.illinois.edu"
-        )
+        efd_client.schema_registry = "https://lsst-schema-registry-efd.ncsa.illinois.edu"
         try:
             yield efd_client
         finally:
@@ -146,9 +138,7 @@ def test_efd_names():
     # the backend to something that doesn't
     # guarantee that
     auth_client = NotebookAuth()
-    assert set(list(EfdClient.list_efd_names())) == set(
-        auth_client.list_auth()
-    )
+    assert set(list(EfdClient.list_efd_names())) == set(auth_client.list_auth())
 
 
 @pytest.mark.asyncio
@@ -256,7 +246,7 @@ async def test_parse_schema():
     for i, name in enumerate("abcd"):
         assert result["name"][i] == name
     for i in range(4):
-        assert result["description"][i] == f"Description {i+1}"
+        assert result["description"][i] == f"Description {i + 1}"
     assert "units" in result.columns
     assert "aunits" in result.columns
     assert "type" not in result.columns
@@ -402,9 +392,7 @@ async def test_time_series(start_stop, start_stop_old):
 @safe_vcr.use_cassette()
 async def test_top_n(start_stop):
     async with make_efd_client() as efd_client:
-        df = await efd_client.select_top_n(
-            "lsst.sal.fooSubSys.test", ["foo", "bar"], 10
-        )
+        df = await efd_client.select_top_n("lsst.sal.fooSubSys.test", ["foo", "bar"], 10)
         assert len(df) == 10
         for c in ["foo", "bar"]:
             assert c in df.columns
@@ -468,9 +456,7 @@ async def test_non_existing_topic(start_stop):
 def test_resample(test_query_res):
     df = test_query_res
     df_copy = df.copy()
-    df_copy.set_index(
-        df_copy.index + pd.Timedelta(0.05, unit="s"), inplace=True
-    )
+    df_copy.set_index(df_copy.index + pd.Timedelta(0.05, unit="s"), inplace=True)
     df_out = resample(df, df_copy)
     assert len(df_out) == 2 * len(df)
 

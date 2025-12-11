@@ -114,7 +114,7 @@ jobs:
     permissions:
       id-token: write
     if: github.event_name == 'release' && github.event.action == 'published'
-    needs: [lint, test, test-package, docs]
+    needs: [test, test-package, docs]
     timeout-minutes: 10
 
     steps:
