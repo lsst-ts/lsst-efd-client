@@ -1,6 +1,18 @@
 # Change log
 
-<!-- scriv-insert-here -->
+## 0.14.0 (2025-12-12)
+
+### New features
+
+- Unpin numpy in pyproject.toml
+- Add aioinflux source as a module to lsst_efd_client and remove it as an external import.
+
+### Other changes
+
+- Migrate packaging to use `pyproject.toml`.
+- Update documentation to use the Rubin user guide theme from Documenteer.
+- Add GitHub Actions for continuous integration.
+- Add tox for test orchestration.
 
 ## 0.13.2 (2025-10-06)
 
