@@ -126,4 +126,5 @@ jobs:
         uses: lsst-sqre/build-and-publish-to-pypi@v3
         with:
           python-version: "3.13"
-          pypi-token: ${{ secrets.PYPI_SQRE_ADMIN }}
+          username: ${{ secrets.USERNAME}}
+          password: ${{ secrets.PASSWORD}}
