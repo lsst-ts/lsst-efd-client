@@ -54,3 +54,4 @@ requirements:
         - astropy
         - kafkit
         - aiohttp
+        - ciso8601
