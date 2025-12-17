@@ -2,6 +2,17 @@
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-0.14.2'></a>
+## 0.14.1 (2025-12-17)
+
+### Bug fixes
+
+- Add ciso8601 to meta dependencies
+
+### Other changes
+
+- Remove older unused github actions in favor of Jenkins builds
+
 ## 0.14.0 (2025-12-12)
 
 ### New features
