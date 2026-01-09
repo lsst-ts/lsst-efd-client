@@ -28,7 +28,7 @@ def test_efdauth(monkeypatch: pytest.MonkeyPatch) -> None:
         parsed_url.port,
         credentials["idfdev_efd"]["username"],
         credentials["idfdev_efd"]["password"],
-        parsed_url.path
+        parsed_url.path,
     )
     assert auth.list_auth() == ["idfdev_efd"]
 
@@ -37,9 +37,7 @@ def test_efdauth(monkeypatch: pytest.MonkeyPatch) -> None:
         auth.get_auth("test_efd")
 
 
-def test_lsst_rsp(
-    respx_mock: respx.Router, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_lsst_rsp(respx_mock: respx.Router, monkeypatch: pytest.MonkeyPatch) -> None:
     data_path = Path(__file__).parent / "data"
     discovery_path = data_path / "discovery" / "v1.json"
     creds_path = data_path / "discovery" / "idfdev_efd.json"
@@ -54,7 +52,7 @@ def test_lsst_rsp(
         parsed_url.port,
         data["username"],
         data["password"],
-        parsed_url.path
+        parsed_url.path,
     )
 
     monkeypatch.setenv("ACCESS_TOKEN", "some-token")

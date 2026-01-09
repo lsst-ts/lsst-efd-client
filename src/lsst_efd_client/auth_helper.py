@@ -9,11 +9,11 @@ import requests
 
 try:
     from lsst.rsp import (
-        get_influxdb_credentials,
-        list_influxdb_labels,
-        UnknownInfluxDBError,
         DiscoveryNotAvailableError,
         TokenNotAvailableError,
+        UnknownInfluxDBError,
+        get_influxdb_credentials,
+        list_influxdb_labels,
     )
 
     _HAVE_LSST_RSP = True
@@ -79,9 +79,7 @@ class NotebookAuth:
         if _HAVE_LSST_RSP:
             try:
                 credentials = get_influxdb_credentials(
-                    alias,
-                    self.token,
-                    discovery_v1_path=self._discovery_v1_path
+                    alias, self.token, discovery_v1_path=self._discovery_v1_path
                 )
                 parsed_url = urlparse(credentials.url)
                 return (
@@ -94,8 +92,7 @@ class NotebookAuth:
                 )
             except UnknownInfluxDBError:
                 raise ValueError(
-                    f"No credentials available for {alias}. "
-                    "Try list_auth to get a list of available keys."
+                    f"No credentials available for {alias}. Try list_auth to get a list of available keys."
                 )
             except (DiscoveryNotAvailableError, TokenNotAvailableError):
                 pass
@@ -110,8 +107,7 @@ class NotebookAuth:
             auth_creds = auth_data.get(alias)
             if not auth_creds:
                 raise ValueError(
-                    f"No credentials available for {alias}. "
-                    "Try list_auth to get a list of available keys."
+                    f"No credentials available for {alias}. Try list_auth to get a list of available keys."
                 )
             parsed_url = urlparse(auth_creds["url"])
             return (
@@ -125,9 +121,7 @@ class NotebookAuth:
 
         # Fall back on Segwarides. This will stop working in the near future
         # since the Segwarides service is being turned off.
-        response = requests.get(
-            urljoin(self.service_endpoint, f"creds/{alias}")
-        )
+        response = requests.get(urljoin(self.service_endpoint, f"creds/{alias}"))
         if response.status_code == 200:
             data = response.json()
             return (
