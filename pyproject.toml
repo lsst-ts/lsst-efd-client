@@ -46,7 +46,6 @@ dev = [
     "pre-commit",
     "mypy",
     "requests",
-    "respx",
     # Documentation
     "documenteer[guide]",
     "documenteer[pipelines]",

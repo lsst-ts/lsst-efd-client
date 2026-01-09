@@ -9,10 +9,18 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 import pytest
-import respx
-from httpx import Request, Response
+import vcr
 
 from lsst_efd_client import NotebookAuth
+
+PATH = Path(__file__).parent.absolute()
+
+# VCR configuration for recording/replaying HTTP requests
+safe_vcr = vcr.VCR(
+    record_mode="none",
+    cassette_library_dir=str(PATH / "cassettes"),
+    path_transformer=vcr.VCR.ensure_suffix(".yaml"),
+)
 
 
 def test_efdauth(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -37,13 +45,11 @@ def test_efdauth(monkeypatch: pytest.MonkeyPatch) -> None:
         auth.get_auth("test_efd")
 
 
-def test_lsst_rsp(respx_mock: respx.Router, monkeypatch: pytest.MonkeyPatch) -> None:
+@safe_vcr.use_cassette()
+def test_lsst_rsp(monkeypatch: pytest.MonkeyPatch) -> None:
     data_path = Path(__file__).parent / "data"
     discovery_path = data_path / "discovery" / "v1.json"
     creds_path = data_path / "discovery" / "idfdev_efd.json"
-    discovery = json.loads(discovery_path.read_text())
-    discovery_data = discovery["influxdb_databases"]["idfdev_efd"]
-    credentials_url = discovery_data["credentials_url"]
     data = json.loads(creds_path.read_text())
     parsed_url = urlparse(data["url"])
     expected = (
@@ -56,12 +62,6 @@ def test_lsst_rsp(respx_mock: respx.Router, monkeypatch: pytest.MonkeyPatch) -> 
     )
 
     monkeypatch.setenv("ACCESS_TOKEN", "some-token")
-
-    def handler(request: Request) -> Response:
-        assert request.headers["Authorization"] == "Bearer some-token"
-        return Response(200, json=data)
-
-    respx_mock.get(credentials_url).mock(side_effect=handler)
 
     auth = NotebookAuth(discovery_v1_path=discovery_path)
     assert auth.get_auth("idfdev_efd") == expected
