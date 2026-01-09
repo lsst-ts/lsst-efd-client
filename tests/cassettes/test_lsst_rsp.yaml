@@ -1,0 +1,38 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Authorization:
+      - Bearer some-token
+    method: GET
+    uri: https://example.com/repertoire/discovery/influxdb/idfdev_efd
+  response:
+    body:
+      encoding: utf-8
+      string: '{"url": "https://data.example.com/influxdb/", "database": "efd", "username":
+        "efdreader", "password": "some-password", "schema_registry": "http://sasquatch-schema-registry.sasquatch:8081/"}'
+    headers:
+      Content-Type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Authorization:
+      - Bearer some-token
+    method: GET
+    uri: https://example.com/repertoire/discovery/influxdb/idfdev_efd
+  response:
+    body:
+      encoding: utf-8
+      string: '{"url": "https://data.example.com/influxdb/", "database": "efd", "username":
+        "efdreader", "password": "some-password", "schema_registry": "http://sasquatch-schema-registry.sasquatch:8081/"}'
+    headers:
+      Content-Type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+version: 1

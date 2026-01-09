@@ -26,7 +26,6 @@ test:
         - ciso8601
         - pytest-cov
         - pytest-asyncio
-        - respx
     source_files:
         - pyproject.toml
         - src
