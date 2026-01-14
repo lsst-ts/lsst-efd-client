@@ -38,6 +38,8 @@ def test_efdauth(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 def test_lsst_rsp(respx_mock: respx.Router, monkeypatch: pytest.MonkeyPatch) -> None:
+    pytest.importorskip("lsst.rsp")
+
     data_path = Path(__file__).parent / "data"
     discovery_path = data_path / "discovery" / "v1.json"
     creds_path = data_path / "discovery" / "idfdev_efd.json"
