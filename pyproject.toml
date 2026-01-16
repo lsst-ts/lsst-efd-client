@@ -38,12 +38,15 @@ dynamic = ["version"]
 dev = [
     # Testing
     "coverage[toml]",
+    "httpx",
+    "lsst-rsp>=0.10",
     "pytest",
     "pytest-asyncio",
     "pytest-vcr",
     "pre-commit",
     "mypy",
     "requests",
+    "respx",
     # Documentation
     "documenteer[guide]",
     "documenteer[pipelines]",
@@ -91,30 +94,6 @@ exclude_lines = [
     "if TYPE_CHECKING:"
 ]
 
-[tool.black]
-line-length = 79
-target-version = ["py310"]
-exclude = '''
-/(
-    \.eggs
-  | \.git
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | _build
-  | build
-  | dist
-)/
-'''
-# Use single-quoted strings so TOML treats the string like a Python r-string
-#  Multi-line strings are implicitly treated by black as regular expressions
-
-[tool.isort]
-profile = "black"
-line_length = 79
-known_first_party = ["lsst_efd_client", "tests"]
-skip = ["docs/conf.py"]
-
 [tool.pytest.ini_options]
 asyncio_mode = "strict"
 python_files = [
@@ -122,17 +101,17 @@ python_files = [
     "tests/*/*.py"
 ]
 
-[tool.mypy]
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
-ignore_missing_imports = true
-local_partial_types = true
-no_implicit_reexport = true
-strict_equality = true
-warn_redundant_casts = true
-warn_unreachable = true
-warn_unused_ignores = true
-# plugins =
+[tool.ruff]
+line-length = 88 # default for ruff
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F"]
+fixable = ["ALL"] # args: [--fix] in .pre-commit-config.yaml
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
 
 [tool.scriv]
 categories = [

@@ -11,6 +11,7 @@ import pytest
 import vcr
 from astropy.time import Time, TimeDelta
 from kafkit.registry.sansio import MockRegistryApi
+from requests import ConnectionError
 
 from lsst_efd_client import (
     EfdClient,
@@ -110,8 +111,9 @@ def start_stop_old():
 
 
 def test_bad_endpoint():
-    with pytest.raises(IOError):
-        NotebookAuth(service_endpoint="https://no.path.here.net.gov")
+    with pytest.raises(ConnectionError):
+        auth = NotebookAuth(service_endpoint="https://no.path.here.net.gov")
+        auth.get_auth("test_efd")
 
 
 @safe_vcr.use_cassette()
