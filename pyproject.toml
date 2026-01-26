@@ -68,6 +68,7 @@ version = { attr = "setuptools_scm.get_version" }
 where = [ "src" ]
 
 [tool.setuptools_scm]
+search_parent_directories = true
 
 [tool.coverage.run]
 parallel = true
