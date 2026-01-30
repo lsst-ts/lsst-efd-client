@@ -19,7 +19,7 @@ test:
         - requests
         - fastavro
         - numpy
-        - pandas >=2.2
+        - pandas =2.2
         - astropy
         - kafkit
         - aiohttp
