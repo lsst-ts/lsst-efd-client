@@ -45,8 +45,6 @@ requirements:
         - setuptools_scm {{ setuptools_scm }}
     run:
         - python {{ python }}
-        - setuptools {{ setuptools }}
-        - setuptools_scm {{ setuptools_scm }}
         - requests
         - fastavro
         - numpy
