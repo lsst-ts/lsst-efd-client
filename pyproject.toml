@@ -53,9 +53,9 @@ Source = "https://github.com/lsst-ts/lsst-efd-client"
 
 [build-system]
 requires = [
-    "setuptools>=61",
+    "setuptools",
     "wheel",
-    "setuptools_scm[toml]>=6.2"
+    "setuptools_scm[toml]"
 ]
 build-backend = "setuptools.build_meta"
 
