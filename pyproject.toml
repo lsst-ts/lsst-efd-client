@@ -29,6 +29,7 @@ dependencies = [
     "tables",
     "kafkit",
     "ciso8601",
+    "fastavro",
 ]
 dynamic = ["version"]
 
@@ -63,7 +64,13 @@ build-backend = "setuptools.build_meta"
 where = [ "src" ]
 
 [tool.setuptools_scm]
-search_parent_directories = true
+# DONT? add this -- search_parent_directories = true
+
+# This allows the build to succeed even if Git is missing
+fallback_version = "0.0.0"
+# Optional: If your code is in a subdirectory like 'src',
+# sometimes you need to explicitly point to the root
+root = "."
 
 [tool.coverage.run]
 parallel = true
