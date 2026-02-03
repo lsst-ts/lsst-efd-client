@@ -1,4 +1,5 @@
 {% set data= load_setup_py_data() %}
+#{% set version = environ.get('VERSION', '0.0.0') %}
 
 package:
     name: lsst-efd-client
@@ -10,28 +11,6 @@ source:
 build:
     noarch: python
     script: {{ PYTHON }} -m pip install --no-deps --ignore-installed .
-
-test:
-    requires:
-        - ts-conda-build =0.5
-        - vcrpy
-        - pytables
-        - requests
-        - fastavro
-        - numpy
-        - pandas =2.2
-        - astropy
-        - kafkit
-        - aiohttp
-        - ciso8601
-        - pytest-cov
-        - pytest-asyncio
-    source_files:
-        - pyproject.toml
-        - src
-        - tests
-    commands:
-        - pytest
 
 requirements:
     host:
@@ -55,3 +34,17 @@ requirements:
         - kafkit
         - aiohttp
         - ciso8601
+
+test:
+    requires:
+        - ts-conda-build =0.5
+        - vcrpy
+        - pytables
+        - pytest-cov
+        - pytest-asyncio
+    source_files:
+        - pyproject.toml
+        - src
+        - tests
+    commands:
+        - pytest
