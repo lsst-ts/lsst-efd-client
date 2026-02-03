@@ -472,8 +472,8 @@ def test_rendezvous(test_df):
             assert np.isnan(rec[1]["ham0_y"])
             assert np.isnan(rec[1]["egg0_y"])
         elif i > 25 and i < 76:
-            assert rec[1]["ham0_y"] == sub["ham0"][0]
-            assert rec[1]["egg0_y"] == sub["egg0"][0]
+            assert rec[1]["ham0_y"] == sub["ham0"].iloc[0]
+            assert rec[1]["egg0_y"] == sub["egg0"].iloc[0]
         elif i > 75:
-            assert rec[1]["ham0_y"] == sub["ham0"][1]
-            assert rec[1]["egg0_y"] == sub["egg0"][1]
+            assert rec[1]["ham0_y"] == sub["ham0"].iloc[1]
+            assert rec[1]["egg0_y"] == sub["egg0"].iloc[1]

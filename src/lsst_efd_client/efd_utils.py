@@ -65,12 +65,14 @@ def merge_packed_time_series(
     packed_len = len(packed_dataframe)
     n_used = npack // stride  # number of raw fields being used
     output = np.empty(n_used * packed_len)
-    times = np.empty_like(output, dtype=packed_dataframe[ref_timestamp_col][0])
+    times = np.empty_like(output, dtype=packed_dataframe[ref_timestamp_col].iloc[0])
 
     if packed_len == 1:
         dt = 0
     else:
-        dt = (packed_dataframe[ref_timestamp_col][1] - packed_dataframe[ref_timestamp_col][0]) / npack
+        dt = (
+            packed_dataframe[ref_timestamp_col].iloc[1] - packed_dataframe[ref_timestamp_col].iloc[0]
+        ) / npack
     for i in range(0, npack, stride):
         i0 = i // stride
         output[i0::n_used] = packed_dataframe[f"{base_field}{i}"]
