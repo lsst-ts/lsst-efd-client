@@ -13,15 +13,13 @@ keywords = [
 classifiers = [
     "Development Status :: 4 - Beta",
     "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python",
-    "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Intended Audience :: Developers",
     "Natural Language :: English",
     "Operating System :: POSIX",
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 dependencies = [
     "aiohttp",
     "numpy",
@@ -31,6 +29,7 @@ dependencies = [
     "tables",
     "kafkit",
     "ciso8601",
+    "fastavro",
 ]
 dynamic = ["version"]
 
@@ -61,14 +60,12 @@ requires = [
 ]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools.dynamic]
-version = { attr = "setuptools_scm.get_version" }
-
 [tool.setuptools.packages.find]
 where = [ "src" ]
 
 [tool.setuptools_scm]
-search_parent_directories = true
+# This allows the build to succeed even if Git is missing
+fallback_version = "0.0.0"
 
 [tool.coverage.run]
 parallel = true
@@ -94,7 +91,7 @@ exclude_lines = [
 
 [tool.black]
 line-length = 79
-target-version = ["py310"]
+target-version = ["py313"]
 exclude = '''
 /(
     \.eggs
@@ -107,8 +104,6 @@ exclude = '''
   | dist
 )/
 '''
-# Use single-quoted strings so TOML treats the string like a Python r-string
-#  Multi-line strings are implicitly treated by black as regular expressions
 
 [tool.isort]
 profile = "black"
