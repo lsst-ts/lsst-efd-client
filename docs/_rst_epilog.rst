@@ -8,3 +8,4 @@
 .. _Scriv: https://scriv.readthedocs.io/
 .. _Semver: https://semver.org
 .. _tox: https://tox.wiki/
+.. _telemetry data: https://ts-xml.lsst.io/sal_interfaces/index.html
