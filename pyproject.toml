@@ -30,6 +30,7 @@ dependencies = [
     "kafkit",
     "ciso8601",
     "fastavro",
+    "requests",
 ]
 dynamic = ["version"]
 
@@ -44,7 +45,6 @@ dev = [
     "pytest-vcr",
     "pre-commit",
     "mypy",
-    "requests",
     "respx",
     # Documentation
     "documenteer[guide]",
