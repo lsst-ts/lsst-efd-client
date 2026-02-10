@@ -530,7 +530,7 @@ class EfdClientSync(_EfdClientStatic):
             fields,
             start,
             end,
-            self._influx_client.db_name,
+            self._db_name,
             is_window,
             index,
             convert_influx_index,
