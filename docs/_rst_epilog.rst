@@ -9,3 +9,6 @@
 .. _Semver: https://semver.org
 .. _tox: https://tox.wiki/
 .. _telemetry data: https://ts-xml.lsst.io/sal_interfaces/index.html
+.. _astropy.time: https://docs.astropy.org/en/stable/time/index.html
+.. _InfluxQL time syntax: https://docs.influxdata.com/influxdb/v1.8/query_language/explore-data/#time-syntax
+

@@ -7,4 +7,9 @@ User guide
 
    overview
    getting-started
+
+.. toctree::
+   :caption: Guides
+
+   working-with-timestamps
    sal7-indexed-components
