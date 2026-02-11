@@ -57,3 +57,5 @@ To see which databases are available on your current Science Platform environmen
    EfdClient.list_auth()
 
 This will return a list of database labels that you can use to connect with the EFD client.
+
+If you are running the EFD client outside of the Rubin Science Platform, see the :ref:`authentication` section for instructions on how to set up access to the EFD databases.
