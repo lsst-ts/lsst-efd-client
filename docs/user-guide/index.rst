@@ -15,3 +15,4 @@ User guide
    using-influxql
    authentication
    sal7-indexed-components
+   camera-telemetry
