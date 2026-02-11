@@ -12,4 +12,5 @@ User guide
    :caption: Guides
 
    working-with-timestamps
+   using-influxql
    sal7-indexed-components

@@ -1,3 +1,4 @@
+:orphan:
 
 .. _InfluxQL: https://docs.influxdata.com/influxdb/v1.7/query_language/
 .. _lsst-sqre/system-test repository:
@@ -10,5 +11,6 @@
 .. _tox: https://tox.wiki/
 .. _telemetry data: https://ts-xml.lsst.io/sal_interfaces/index.html
 .. _astropy.time: https://docs.astropy.org/en/stable/time/index.html
-.. _InfluxQL time syntax: https://docs.influxdata.com/influxdb/v1.8/query_language/explore-data/#time-syntax
+.. _InfluxQL time syntax: https://docs.influxdata.com/influxdb/v1/query_language/explore-data/#time-syntax
+.. _InfluxQL documentation: https://docs.influxdata.com/influxdb/v1/query_language/
 
