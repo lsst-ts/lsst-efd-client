@@ -1,5 +1,5 @@
 [project]
-title = "LSST EFD Client"
+title = "EFD Client"
 copyright = "2020-2025 Association of Universities for Research in Astronomy, Inc. (AURA)"
 
 [project.python]
