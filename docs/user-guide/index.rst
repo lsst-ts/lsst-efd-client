@@ -14,5 +14,5 @@ User guide
    working-with-timestamps
    using-influxql
    authentication
-   sal7-indexed-components
+   indexed-components
    camera-telemetry
