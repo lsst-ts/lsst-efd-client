@@ -13,7 +13,7 @@ To list the EFD databases available in your environment:
 
 .. code::
 
-    from lsst.rsp list_influxdb_labels
+    from lsst.rsp import list_influxdb_labels
     
     list_influxdb_labels()
 
