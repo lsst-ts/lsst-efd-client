@@ -33,14 +33,14 @@ Tags can also be listed with the following InfluxQL query:
 .. code:: Python
 
     query = '''SHOW TAG KEYS FROM "lsst.MTCamera.focal_plane_aspic_temp"'''
-    await client.influx_client.query(query)
+    await client._influx_client.query(query)
 
 You can use these tags to filter and group data in your queries, for example to get the average ASPIC temperatures in the last minute for a particular Raft:
 
 .. code:: Python
 
     query = '''SELECT mean(temperature) FROM "lsst.MTCamera.focal_plane_aspic_temp" WHERE time > now() - 1m AND Raft='R01' GROUP BY Raft'''
-    await client.influx_client.query(query)
+    await client._influx_client.query(query)
     
 Note that tag values are single quoted in InfluxQL queries.
 
