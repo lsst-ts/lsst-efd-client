@@ -12,21 +12,11 @@ You can check if ``lsst_efd_client`` is available at a Python prompt:
 
    import lsst_efd_client
 
-If not available, you can install with either Conda or pip:
+If not available, you can install with Conda:
 
-.. tab-set::
+.. prompt:: bash
 
-   .. tab-item:: pip
-
-      .. prompt:: bash
-
-         pip install lsst-efd-client
-
-   .. tab-item:: Conda
-
-      .. prompt:: bash
-
-         conda install -c conda-forge lsst-efd-client
+   conda install -c conda-forge lsst-efd-client
 
 
 Quick start
