@@ -5,5 +5,14 @@ User guide
 .. toctree::
    :maxdepth: 2
 
+   overview
    getting-started
-   sal7-indexed-components
+
+.. toctree::
+   :caption: Guides
+
+   working-with-timestamps
+   using-influxql
+   authentication
+   indexed-components
+   camera-telemetry

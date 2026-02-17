@@ -5,31 +5,36 @@ Getting started
 Installation
 ============
 
-The LSST EFD Client is preinstalled in the ``rubin-env-rsp`` and ``rubin-env-developer`` Conda-Forge metapackages, which is the default Python environment for the `Rubin Science Platform`_.
+The EFD Client is preinstalled in the ``rubin-env-rsp`` and ``rubin-env-developer`` Conda-Forge metapackages, which is the default Python environment for the `Rubin Science Platform`_.
 You can check if ``lsst_efd_client`` is available at a Python prompt:
 
 .. prompt:: python >>>
 
    import lsst_efd_client
 
-If not available, you can install with either Conda or pip:
+If not available, you can install with Conda:
 
-.. tab-set::
+.. prompt:: bash
 
-   .. tab-item:: pip
+   conda install -c conda-forge lsst-efd-client
 
-      .. prompt:: bash
 
-         pip install lsst-efd-client
+Quick start
+===========
 
-   .. tab-item:: Conda
+Instantiate the EFD client from the Rubin Science Platform by specifying the label of the database instance you want to connect to.
 
-      .. prompt:: bash
+To connect to the US Data Facility EFD use the database label ``usdf_efd``:
 
-         conda install -c conda-forge lsst-efd-client
+.. code::
 
-Next steps
-==========
+   from lsst_efd_client import EfdClient
 
-- See the example EFD notebooks in the `lsst-sqre/system-test repository`_.
-- Refer to the :ref:`py-api`.
+   client = EfdClient("usdf_efd")
+   await client.get_topics()
+
+This returns the list of available telemetry topics, confirming that the client is connected successfully.
+
+If you are running the EFD client outside the Rubin Science Platform, see the :ref:`authentication` guide for instructions on how to configure the connection to an EFD database instance.
+
+Check the guides section and the :ref:`py-api` for more information on how to use the EFD client.
