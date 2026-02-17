@@ -100,12 +100,24 @@ python_files = [
 ]
 
 [tool.ruff]
-line-length = 88 # default for ruff
-target-version = "py310"
+line-length = 110
+exclude = ["__init__.py"]
 
 [tool.ruff.lint]
-select = ["E", "F"]
+select = ["E", "F", "I", "N", "W"]
 fixable = ["ALL"] # args: [--fix] in .pre-commit-config.yaml
+ignore = [
+  "E203", "E226", "E228", "N802", "N803", "N806", "N812", "N813", "N815", "N816"
+]
+
+[tool.ruff.lint.pycodestyle]
+max-doc-length = 79
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.ruff.lint.isort]
+known-first-party = ["lsst"]
 
 [tool.ruff.format]
 quote-style = "double"
