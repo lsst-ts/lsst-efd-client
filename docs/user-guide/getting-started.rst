@@ -34,7 +34,7 @@ Quick start
 
 Instantiate the EFD client from the Rubin Science Platform by specifying the label of the database instance you want to connect to.
 
-To connect to the US Data Facility EFD use the ``usdf_efd`` label:
+To connect to the US Data Facility EFD use the database label ``usdf_efd``:
 
 .. code::
 

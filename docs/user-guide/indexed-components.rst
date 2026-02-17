@@ -8,5 +8,5 @@ Indexed components (salIndex)
 
 SAL version 7 was deployed at the Summit on 2022-07-06, and the EFD client was updated to accommodate the new indexing scheme.
 
-A boolean flag ``use_old_csc_indexing`` is available on queries methods of the EFD client if you need to query data older that.
+A boolean flag ``use_old_csc_indexing`` is available on query methods of the EFD client if you need to query data older that.
 
