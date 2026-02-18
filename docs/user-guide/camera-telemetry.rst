@@ -22,18 +22,17 @@ The camera telemetry topics have the ``timestamp`` field in UTC which correspond
 The camera telemetry topics also include tags with metadata which can be used to filter and ``GROUP BY`` data in InfluxQL queries.
 
 For example, the ``lsst.MTCamera.focal_plane_aspic_temp`` topic has temperatures from the focal plane ASPICs.
-Check the topic schema to see the available fields and tags:
+Check the topic schema for a description of the available fields and tags:
 
 .. code:: Python
 
     await client.get_schema("lsst.MTCamera.focal_plane_aspic_temp")
 
-Tags can also be listed with the following InfluxQL query:
+In particular, tags can be listed with the ``get_tags()`` method:
 
 .. code:: Python
 
-    query = '''SHOW TAG KEYS FROM "lsst.MTCamera.focal_plane_aspic_temp"'''
-    await client._influx_client.query(query)
+    await client.get_tags("lsst.MTCamera.focal_plane_aspic_temp")
 
 You can use these tags to filter and group data in your queries, for example to get the average ASPIC temperatures in the last minute for a particular Raft:
 
