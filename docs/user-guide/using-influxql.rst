@@ -32,19 +32,19 @@ In the following notebooks, you can find more examples using InfluxQL such as do
 .. grid:: 3
 
    .. grid-item-card:: Querying the EFD with InfluxQL
-      :link: notebooks/UsingInfluxQL.ipynb
+      :link: https://github.com/lsst-ts/lsst-efd-client/blob/main/docs/user-guide/notebooks/UsingInfluxQL.ipynb
       :link-type: url
 
       Learn how to use the EFD client and InfluxQL to query EFD data.
 
    .. grid-item-card:: Downsample data with GROUP BY time()
-      :link: notebooks/UsingInfluxQL.ipynb
+      :link: https://github.com/lsst-ts/lsst-efd-client/blob/main/docs/user-guide/notebooks/Downsampling.ipynb
       :link-type: url
 
       Learn how to downsample data with InfluxQL ``GROUP BY time()``.
 
    .. grid-item-card:: Chunked queries: Efficient Data Retrieval
-      :link: notebooks/ChunkedQueries.ipynb
+      :link: https://github.com/lsst-ts/lsst-efd-client/blob/main/docs/user-guide/notebooks/ChunkedQueries.ipynb
       :link-type: url
 
       Learn how to return chunked responses with the EFD client for efficient retrieval of large datasets.
