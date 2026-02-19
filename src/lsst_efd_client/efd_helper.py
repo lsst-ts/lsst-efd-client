@@ -467,6 +467,24 @@ class EfdClientSync(_EfdClientStatic):
         fields = self._do_query(f'SHOW FIELD KEYS FROM "{self._db_name}"."autogen"."{topic_name}"')
         return fields["fieldKey"].tolist()
 
+    def get_tags(self, topic_name):
+        """Query the list of tag names for a topic.
+
+        Parameters
+        ----------
+        topic_name : `str`
+            Name of topic to query for tag names.
+
+        Returns
+        -------
+        results : `list`
+            List of tag names in specified topic.
+        """
+        tags = self._do_query(f'SHOW TAG KEYS FROM "{self._db_name}"."autogen"."{topic_name}"')
+
+        value = tags.get("tagKey")
+        return value.tolist() if value is not None else []
+
     @property
     def query_history(self):
         """Return query history
@@ -847,6 +865,24 @@ class EfdClient(_EfdClientStatic):
         """
         fields = await self._do_query(f'SHOW FIELD KEYS FROM "{self._db_name}"."autogen"."{topic_name}"')
         return fields["fieldKey"].tolist()
+
+    async def get_tags(self, topic_name):
+        """Query the list of tag names for a topic.
+
+        Parameters
+        ----------
+        topic_name : `str`
+            Name of topic to query for tag names.
+
+        Returns
+        -------
+        results : `list`
+            List of tag names in specified topic.
+        """
+        tags = await self._do_query(f'SHOW TAG KEYS FROM "{self._db_name}"."autogen"."{topic_name}"')
+
+        value = tags.get("tagKey")
+        return value.tolist() if value is not None else []
 
     @property
     def query_history(self):
