@@ -8,3 +8,7 @@ exclude_patterns = [
     "_rst_epilog.rst",
     "**.ipynb",
 ]
+
+linkcheck_ignore = [
+    r"https://usdf-rsp.slac.stanford.edu/repertoire/discovery/influxdb",
+]

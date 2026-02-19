@@ -4,10 +4,10 @@
 Authentication
 ##############
 
-This guide describes how EFD client authentication works and how to configure it when running outside the Rubin Science Platform.
+This guide describes how EFD client authentication works and how to configure it when running outside the Rubin Science Platform (RSP).
 
 Listing available EFD databases
--------------------------------
+===============================
 
 To list the EFD databases available in your environment:
 
@@ -17,8 +17,7 @@ To list the EFD databases available in your environment:
     
     list_influxdb_labels()
 
-This returns a list of database labels that you can use to connect with the EFD client.
-Then you can instantiate the client with:
+This returns a list of database labels that can be used to instantiate the EFD client:
 
 .. code::
 
@@ -26,43 +25,30 @@ Then you can instantiate the client with:
 
     client = EfdClient("<database_label>")
 
-When running the EFD client inside the Rubin Science Platform, the connection information associated with the database label is automatically retrieved from `Repertoire`_ service discovery.
+When running the EFD client inside the RSP, the connection information associated with the database label is automatically retrieved from the `Repertoire`_ service discovery.
 
-Authentication outside the Rubin Science Platform
---------------------------------------------------
 
-When running the EFD client outside of the Rubin Science Platform, you must configure the connection information manually. 
+Authentication outside the RSP
+==============================
 
-The connection information must be retrieved from Repertoire and stored in a local file referenced by the ``EFDAUTH`` environment variable.
+When running the EFD client outside the RSP, you must:
 
-Inside the Rubin Science Platform environment, you can retrieve the connection information with:
+1.	Retrieve the connection information from Repertoire service discovery API.
+2.	Store the connection information in a local JSON file.
+3.	Set the ``EFDAUTH`` environment variable to point to that file.
 
-.. code:: Python
-    
-    from lsst.rsp import get_influxdb_credentials
+The Repertoire service discovery API provides the ``/repertoire/discovery/influxdb`` endpoint to retrieve connection information for available EFD databases.
+This endpoint is accessible from within the RSP and requires authentication.
 
-    get_influxdb_credentials("<database_label>")
+.. button-link:: https://usdf-rsp.slac.stanford.edu/repertoire/discovery/influxdb
+   :color: primary
+   :outline:
+   :expand:
 
-Create a local JSON file with the retrieved connection information. 
-The JSON file has a mapping of database label to connection information, and allows for multiple entries if needed.
+   Retrieve US Data Facility EFD connection information
 
-The following example illustrates the required schema of the JSON file using placeholder values:
-
-.. code:: JSON
-
-    {
-        "<database_label>": {
-            "url": "<database_url>",
-            "database": "<database_name>",
-            "username": "<username>",
-            "password": "<password>",
-            "schema_registry": "<schema_registry_url>"
-        }
-    }
-
-Then set the environment variable ``EFDAUTH`` to the path of the JSON file and instantiate the EFD client with the desired database label.
+The JSON file must contain a mapping of the database labels to the connection information required by the EFD client.
 
 .. note::
 
     Do not commit this file to source control, as it contains credentials.
-

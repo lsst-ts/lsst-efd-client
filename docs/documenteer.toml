@@ -7,6 +7,7 @@ package = "lsst_efd_client"
 
 [sphinx]
 rst_epilog_file = "_rst_epilog.rst"
+extensions = ["sphinx_design"]
 
 [sphinx.intersphinx.projects]
 python = "https://docs.python.org/3/"
