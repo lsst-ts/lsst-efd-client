@@ -4,6 +4,7 @@ from enum import Enum
 from functools import partial
 from typing import Any
 from urllib.parse import urljoin
+from warnings import warn
 
 import aiohttp
 import astropy.units as u
@@ -423,6 +424,13 @@ class EfdClientSync(_EfdClientStatic):
         self._db_name = db_name
         self._query_history = []
 
+    @property
+    def influx_client(self):
+        """Previously available influx_client now with a deprecation warning"""
+        warn("Deprecated attribute: influx_client")
+
+        return self._influx_client
+
     def _do_query(self, query: str, convert_influx_index=False):
         """Query the influxDB and return results
 
@@ -834,6 +842,13 @@ class EfdClient(_EfdClientStatic):
         ) = EfdClientTools.get_client(efd_name, EfdClient.mode, db_name, creds_service, timeout, client)
         self._db_name = db_name
         self._query_history = []
+
+    @property
+    def influx_client(self):
+        """Previously available influx_client now with a deprecation warning"""
+        warn("Deprecated attribute: influx_client")
+
+        return self._influx_client
 
     async def _do_query(self, query: str, convert_influx_index=False):
         #  Helper function to do influxdb queries.
