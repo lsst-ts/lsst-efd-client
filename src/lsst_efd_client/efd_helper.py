@@ -421,6 +421,19 @@ class EfdClientSync(_EfdClientStatic):
         self._db_name = db_name
         self._query_history = []
 
+    @property
+    def influx_client(self):
+        """Previously available influx_client now with a deprecation warning"""
+        import logging
+
+        logger = logging.get_logger()
+        logger.warning(
+            "influx_client was deprecated and may not be available in the future, \
+            support for custom influx queries is still out for debate"
+        )
+
+        return self._influx_client
+
     def _do_query(self, query: str, convert_influx_index=False):
         """Query the influxDB and return results
 
@@ -832,6 +845,19 @@ class EfdClient(_EfdClientStatic):
         ) = EfdClientTools.get_client(efd_name, EfdClient.mode, db_name, creds_service, timeout, client)
         self._db_name = db_name
         self._query_history = []
+
+    @property
+    def influx_client(self):
+        """Previously available influx_client now with a deprecation warning"""
+        import logging
+
+        logger = logging.get_logger()
+        logger.warning(
+            "influx_client was deprecated and may not be available in the future, \
+            support for custom influx queries is still out for debate"
+        )
+
+        return self._influx_client
 
     async def _do_query(self, query: str, convert_influx_index=False):
         #  Helper function to do influxdb queries.
