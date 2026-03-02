@@ -4,12 +4,14 @@
 Authentication
 ##############
 
-This guide describes how EFD client authentication works and how to configure it when running outside the Rubin Science Platform (RSP).
+This guide describes how authentication for the EFD client works both inside and outside the Rubin Science Platform (RSP).
 
-Listing available EFD databases
-===============================
+Authentication inside the RSP
+=============================
 
-To list the EFD databases available in your environment:
+When running the EFD client inside the RSP, authentication is handled automatically by `Repertoire`_ service discovery. 
+
+To list the available EFD databases in your RSP environment:
 
 .. code::
 
@@ -17,15 +19,13 @@ To list the EFD databases available in your environment:
     
     list_influxdb_labels()
 
-This returns a list of database labels that can be used to instantiate the EFD client:
+This returns a list of database labels that can be used to initialize the EFD client:
 
 .. code::
 
     from lsst_efd_client import EfdClient
 
     client = EfdClient("<database_label>")
-
-When running the EFD client inside the RSP, the connection information associated with the database label is automatically retrieved from the `Repertoire`_ service discovery.
 
 
 Authentication outside the RSP
