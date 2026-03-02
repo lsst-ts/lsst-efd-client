@@ -6,6 +6,13 @@ Authentication
 
 This guide describes how authentication for the EFD client works both inside and outside the Rubin Science Platform (RSP).
 
+.. note::
+
+    The EFD client is migrating to use the RSP Repertoire service discovery.
+    The current authentication method with Segwarides will be deprecated in the future. 
+    
+    When running the EFD client outside the RSP, you should use the new Repertoire-based authentication method described below.
+    
 Authentication inside the RSP
 =============================
 
