@@ -38,24 +38,27 @@ This returns a list of database labels that can be used to initialize the EFD cl
 Authentication outside the RSP
 ==============================
 
-When running the EFD client outside the RSP, you must:
+When running the EFD client outside the RSP, you have to provide the database connection information in a local JSON file following these steps:
 
-1.	Retrieve the connection information from Repertoire service discovery API.
-2.	Store the connection information in a local JSON file.
-3.	Set the ``EFDAUTH`` environment variable to point to that file.
+1.	Retrieve the database connection information from Repertoire
 
-The Repertoire service discovery API provides the ``/repertoire/discovery/influxdb`` endpoint to retrieve connection information for available EFD databases.
-This endpoint is accessible from within the RSP and requires authentication.
+The Repertoire service discovery API provides the ``/repertoire/discovery/influxdb`` endpoint to retrieve connection information to EFD databases.
+You must be authenticated to the RSP in your browser to access this endpoint.
 
-.. button-link:: https://usdf-rsp.slac.stanford.edu/repertoire/discovery/influxdb
-   :color: primary
-   :outline:
-   :expand:
+For example, to retrieve the connection information for the USDF EFD, open the following URL in your browser:
 
-   Retrieve US Data Facility EFD connection information
+``https://usdf-rsp.slac.stanford.edu/repertoire/discovery/influxdb``
 
-The JSON file must contain a mapping of the database labels to the connection information required by the EFD client.
+The JSON response contains a mapping of the database label to the connection information required by the EFD client.
 
-.. note::
+2.	Copy the the JSON response and store in a local file, e.g. ``~/.efdauth.json``.
 
-    Do not commit this file to source control, as it contains credentials.
+3.	Set the ``EFDAUTH`` environment variable to point to this file before initializing the EFD client:
+
+.. code::
+
+    import os
+    from lsst_efd_client import EfdClient
+
+    os.environ["EFDAUTH"] =  os.path.expanduser("~/.efdauth.json")
+    client = EfdClient("<database_label>")
