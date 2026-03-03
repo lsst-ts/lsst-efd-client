@@ -425,9 +425,27 @@ class EfdClientSync(_EfdClientStatic):
     @property
     def influx_client(self):
         """Previously available influx_client now with a deprecation warning"""
-        warn("Deprecated attribute: influx_client")
+        warn("Deprecated attribute: influx_client will be removed in v0.16.0, please use send_custom_query")
 
         return self._influx_client
+
+    def send_custom_query(self, query_string):
+        """Method to send a custom influx query to EFD using private method
+        Parameters
+        ----------
+        query : `str`
+            Query string to execute.
+        convert_influx_index : `bool`
+            Legacy flag to convert time index from TAI to UTC
+
+        Returns
+        -------
+        results : `pandas.DataFrame`
+            Results of the query in a `~pandas.DataFrame`
+        """
+
+        result = self._do_query(self, query_string)
+        return result
 
     def _do_query(self, query: str, convert_influx_index=False):
         """Query the influxDB and return results
@@ -844,12 +862,43 @@ class EfdClient(_EfdClientStatic):
     @property
     def influx_client(self):
         """Previously available influx_client now with a deprecation warning"""
-        warn("Deprecated attribute: influx_client")
+        warn("Deprecated attribute: influx_client will be removed in v0.16.0, please use send_custom_query")
 
         return self._influx_client
 
+    async def send_custom_query(self, query_string):
+        """Method to send a custom influx query to EFD using private method
+        Parameters
+        ----------
+        query : `str`
+            Query string to execute.
+        convert_influx_index : `bool`
+            Legacy flag to convert time index from TAI to UTC
+
+        Returns
+        -------
+        results : `pandas.DataFrame`
+            Results of the query in a `~pandas.DataFrame`
+        """
+
+        result = await self._do_query(self, query_string)
+        return result
+
     async def _do_query(self, query: str, convert_influx_index=False):
-        #  Helper function to do influxdb queries.
+        """Query the influxDB and return results
+
+        Parameters
+        ----------
+        query : `str`
+            Query string to execute.
+        convert_influx_index : `bool`
+            Legacy flag to convert time index from TAI to UTC
+
+        Returns
+        -------
+        results : `pandas.DataFrame`
+            Results of the query in a `~pandas.DataFrame`.
+        """
         self._query_history.append(query)
         result = await self._influx_client.query(query)
         return EfdClientTools.handle_query_result(result, convert_influx_index=convert_influx_index)
