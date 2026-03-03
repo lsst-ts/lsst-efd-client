@@ -120,6 +120,8 @@ class EfdClientTools:
         ) = auth.get_auth(efd_name)
 
         if client is None:
+            # Default to port 443 if not specified
+            port = port or 443
             health_url = urljoin(f"https://{host}:{port}", f"{path}health")
             response = requests.get(health_url)
             if response.status_code != 200:
