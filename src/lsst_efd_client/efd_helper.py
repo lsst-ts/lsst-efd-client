@@ -446,7 +446,7 @@ class EfdClientSync(_EfdClientStatic):
             Results of the query in a `~pandas.DataFrame`
         """
 
-        result = self._do_query(self, query, convert_influx_index)
+        result = self._do_query(query, convert_influx_index)
         return result
 
     def _do_query(self, query: str, convert_influx_index=False):
@@ -888,9 +888,8 @@ class EfdClient(_EfdClientStatic):
         result : `pandas.DataFrame`
             Results of the query in a `~pandas.DataFrame`
         """
-
         result = await self._do_query(
-            self, query, chunked=chunked, chunk_size=chunk_size, convert_influx_index=convert_influx_index
+            query, chunked=chunked, chunk_size=chunk_size, convert_influx_index=convert_influx_index
         )
         return result
 
