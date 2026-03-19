@@ -6,7 +6,7 @@ Using InfluxQL
 
 This guide describes how to use the InfluxQL query language with the EFD client.
  
-To execute InfluxQL queries you can use the ``send_custom_query()`` method in conjunction with the EFD client.
+To execute InfluxQL queries you can use the ``influxql_query()`` method in conjunction with the EFD client.
 
 .. code::
 
@@ -14,14 +14,14 @@ To execute InfluxQL queries you can use the ``send_custom_query()`` method in co
 
    client = EfdClient("usdf_efd")
    query = '''SELECT vacuum FROM "lsst.sal.ATCamera.vacuum" WHERE time > now() - 1h'''
-   await client.send_custom_query(query)
+   await client.influxql_query(query)
 
 This query returns ``vaccum`` measurements for the ``ATCamera`` in the last hour. 
 It uses the the InfluxQL ``now()`` function to query a time range relative to the server's current time.
 
 See `InfluxQL time syntax`_ documentation for detailed information on how to specify time ranges in InfluxQL queries.
 
-The EFD client helper function ``build_time_range_query()`` can also be used to build InfluxQL queries for a topic and time range, which can then be executed with the ``send_custom_query()`` method.
+The EFD client helper function ``build_time_range_query()`` can also be used to build InfluxQL queries for a topic and time range, which can then be executed with the ``influxql_query()`` method.
 
 .. note::
    
