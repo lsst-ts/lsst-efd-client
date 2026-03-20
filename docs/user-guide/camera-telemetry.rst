@@ -39,7 +39,7 @@ You can use these tags to filter and group data in your queries, for example to 
 .. code:: Python
 
     query = '''SELECT mean(temperature) FROM "lsst.MTCamera.focal_plane_aspic_temp" WHERE time > now() - 1m AND Raft='R01' GROUP BY Raft'''
-    await client._influx_client.query(query)
+    await client.influxql_query(query)
     
 Note that tag values are single quoted in InfluxQL queries.
 

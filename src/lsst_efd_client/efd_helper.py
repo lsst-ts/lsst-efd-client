@@ -4,6 +4,7 @@ from enum import Enum
 from functools import partial
 from typing import Any
 from urllib.parse import urljoin
+from warnings import warn
 
 import aiohttp
 import astropy.units as u
@@ -423,6 +424,31 @@ class EfdClientSync(_EfdClientStatic):
         self._db_name = db_name
         self._query_history = []
 
+    @property
+    def influx_client(self):
+        """Deprecated property"""
+        warn("Deprecated attribute: influx_client will be removed in v0.16.0, please use influxql_query")
+
+        return self._influx_client
+
+    def influxql_query(self, query: str, convert_influx_index: bool = False):
+        """Method to send a custom influx query to EFD using private method
+        Parameters
+        ----------
+        query : `str`
+            Query string to execute.
+        convert_influx_index : `bool`
+            Legacy flag to convert time index from TAI to UTC
+
+        Returns
+        -------
+        result : `pandas.DataFrame`
+            Results of the query in a `~pandas.DataFrame`
+        """
+
+        result = self._do_query(query, convert_influx_index)
+        return result
+
     def _do_query(self, query: str, convert_influx_index=False):
         """Query the influxDB and return results
 
@@ -435,7 +461,7 @@ class EfdClientSync(_EfdClientStatic):
 
         Returns
         -------
-        results : `pandas.DataFrame`
+        result : `pandas.DataFrame`
             Results of the query in a `~pandas.DataFrame`.
         """
         self._query_history.append(query)
@@ -835,10 +861,61 @@ class EfdClient(_EfdClientStatic):
         self._db_name = db_name
         self._query_history = []
 
-    async def _do_query(self, query: str, convert_influx_index=False):
-        #  Helper function to do influxdb queries.
+    @property
+    def influx_client(self):
+        """Deprecated Property"""
+        warn("Deprecated attribute: influx_client will be removed in v0.16.0, please use influxql_query")
+
+        return self._influx_client
+
+    async def influxql_query(
+        self, query: str, chunked: bool = False, chunk_size: int = None, convert_influx_index: bool = False
+    ):
+        """Method to send a custom influx query to EFD using private method
+        Parameters
+        ----------
+        query : `str`
+            Query string to execute.
+        chunked: `bool`
+            To request InfluxDB return streamed batches of results
+        chunk_size: `int`
+            Maximum number of points for each chunk
+        convert_influx_index : `bool`
+            Legacy flag to convert time index from TAI to UTC
+
+        Returns
+        -------
+        result : `pandas.DataFrame`
+            Results of the query in a `~pandas.DataFrame`
+        """
+        result = await self._do_query(
+            query, chunked=chunked, chunk_size=chunk_size, convert_influx_index=convert_influx_index
+        )
+        return result
+
+    async def _do_query(
+        self, query: str, chunked: bool = False, chunk_size: int = None, convert_influx_index: bool = False
+    ):
+        """Query the influxDB and return results
+
+        Parameters
+        ----------
+        query : `str`
+            Query string to execute.
+        chunked: `bool`
+            Request InfluxDB return streamed batches of results
+        chunk_size: `int`
+            Maximum number of points for each chunk
+        convert_influx_index : `bool`
+            Legacy flag to convert time index from TAI to UTC
+
+        Returns
+        -------
+        result : `pandas.DataFrame`
+            Results of the query in a `~pandas.DataFrame`.
+        """
         self._query_history.append(query)
-        result = await self._influx_client.query(query)
+        result = await self._influx_client.query(query, chunked=chunked, chunk_size=chunk_size)
         return EfdClientTools.handle_query_result(result, convert_influx_index=convert_influx_index)
 
     async def get_topics(self):
@@ -1013,7 +1090,7 @@ class EfdClient(_EfdClientStatic):
             convert_influx_index,
             use_old_csc_indexing,
         )
-        ret = await self._do_query(query, convert_influx_index)
+        ret = await self._do_query(query, convert_influx_index=convert_influx_index)
         if ret.empty and not await self._is_topic_valid(topic_name):
             raise ValueError(f"Topic {topic_name} not in EFD schema")
         return ret
@@ -1073,7 +1150,7 @@ class EfdClient(_EfdClientStatic):
             use_old_csc_indexing=False,
         )
 
-        ret = await self._do_query(query, convert_influx_index)
+        ret = await self._do_query(query, convert_influx_index=convert_influx_index)
 
         if ret.empty and not await self._is_topic_valid(topic_name):
             raise ValueError(f"Topic {topic_name} not in EFD schema")
