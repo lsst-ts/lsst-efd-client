@@ -40,6 +40,7 @@ dev = [
     "coverage[toml]",
     "httpx",
     "lsst-rsp>=0.10",
+    "pyfakefs",
     "pytest",
     "pytest-asyncio",
     "pytest-vcr",
