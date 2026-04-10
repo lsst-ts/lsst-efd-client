@@ -157,7 +157,7 @@ class EfdClientTools:
         convert_influx_index=False,
         use_old_csc_indexing=False,
     ):
-        # A helper method to buuild the time range query
+        # A helper method to build the time range query
         if not isinstance(start, Time):
             raise TypeError("The first time argument must be a time stamp")
 
@@ -218,7 +218,6 @@ class EfdClientTools:
         db_name,
         time_cut=None,
         index=None,
-        convert_influx_index=False,
         use_old_csc_indexing=False,
     ):
         # A helper method to build the top n query
@@ -319,7 +318,7 @@ class EfdClientTools:
         return pd.DataFrame(vals, index=df.index)
 
     @staticmethod
-    def parse_schema(topic, schema):
+    def parse_schema(schema):
         # A helper function so we can test our parsing
         fields = schema["schema"]["fields"]
         vals = {
@@ -694,10 +693,9 @@ class EfdClientSync(_EfdClientStatic):
             fields,
             num,
             self._db_name,
-            time_cut=None,
-            index=None,
-            convert_influx_index=False,
-            use_old_csc_indexing=False,
+            time_cut=time_cut,
+            index=index,
+            use_old_csc_indexing=use_old_csc_indexing,
         )
 
         ret = self._do_query(query, convert_influx_index)
@@ -820,7 +818,7 @@ class EfdClientSync(_EfdClientStatic):
                 url=self._schema_registry_url,
             )
             schema = registry_api.get_schema_by_subject(f"{topic}-value")
-        return EfdClientTools.parse_schema(topic, schema)
+        return EfdClientTools.parse_schema(schema)
 
 
 class EfdClient(_EfdClientStatic):
@@ -1144,10 +1142,9 @@ class EfdClient(_EfdClientStatic):
             fields,
             num,
             self._db_name,
-            time_cut=None,
-            index=None,
-            convert_influx_index=False,
-            use_old_csc_indexing=False,
+            time_cut=time_cut,
+            index=index,
+            use_old_csc_indexing=use_old_csc_indexing,
         )
 
         ret = await self._do_query(query, convert_influx_index=convert_influx_index)
@@ -1269,4 +1266,4 @@ class EfdClient(_EfdClientStatic):
                 url=self._schema_registry_url,
             )
             schema = await registry_api.get_schema_by_subject(f"{topic}-value")
-        return EfdClientTools.parse_schema(topic, schema)
+        return EfdClientTools.parse_schema(schema)
