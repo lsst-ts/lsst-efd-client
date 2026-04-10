@@ -31,7 +31,31 @@
 
 ### New features
 
-- Adding conda packaging according to telescope and site standards.
+- Add conda packaging according to telescope and site standards.
+
+## 0.13.2-alpha.1 (2024-02-05)
+
+### Backwards-incompatible changes
+
+- Create _EfdClientStatic to hold static utilities between EfdClient and EfdClientSync
+- Create EfdClientTools to share common functions between EfdClient and EfdClientSync
+- Move get_client from EfdClient to EfdClientTools
+- Nest build_time_range_query from EfdClient to EfdClientTools
+- Nest build_select_top_n_query from EfdClient to EfdClientTools
+- Nest _make_fields from EfdClient to EfdClientTools
+- Nest merge_packed_time_series from EfdClient to EfdClientTools
+- Expose and nest _parse_schema from EfdClient to parse_schema in EfdClientTools
+- Nest handle_query_result from EfdClient to EfdClientTools
+- Privatize EfdClient*.influx_client to EfdClient*._influx_client
+- Privatize EfdClient*.schema_registry_url to EfdClient*._schema_registry_url
+- Privatize EfdClient*.db_name to EfdClient*._db_name
+
+### New features
+
+- Add Synchronous client EFDClientSync
+- Add _do_query and query_history to async EfdClient
+- Move and Expose EfdClient._make_fields to EfdClientTools.make_fields
+- Add SyncSchemaParser to enable parse_schema to work for EfdClientSync
 
 ## 0.13.1 (2023-07-01)
 
