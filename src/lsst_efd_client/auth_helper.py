@@ -37,11 +37,6 @@ class NotebookAuth:
         credentials. This need not be provided when running inside a Nublado
         container, where the notebook token will be used, but may be needed
         in other contexts.
-    discovery_v1_path : `pathlib.Path`, optional
-        If provided, override the path to the Repertoire discovery
-        information. This argument is only for testing and should not normally
-        be used. The default behavior uses the normal Nublado path for this
-        information.
 
     Raises
     ------
@@ -54,11 +49,9 @@ class NotebookAuth:
         service_endpoint="https://roundtable.lsst.codes/segwarides/",
         *,
         token: str | None = None,
-        discovery_v1_path: Path | None = None,
     ):
         self.service_endpoint = service_endpoint
         self.token = token
-        self._discovery_v1_path = discovery_v1_path
 
     def get_auth(self, alias):
         """Return the credentials as a tuple
@@ -78,9 +71,7 @@ class NotebookAuth:
         # is the preferred approach inside Nublado notebooks.
         if _HAVE_LSST_RSP:
             try:
-                credentials = get_influxdb_credentials(
-                    alias, self.token, discovery_v1_path=self._discovery_v1_path
-                )
+                credentials = get_influxdb_credentials(alias, self.token)
                 parsed_url = urlparse(credentials.url)
                 return (
                     parsed_url.hostname,
