@@ -3,6 +3,18 @@
 <!-- scriv-insert-here -->
 
 <a id='changelog-0.14.2'></a>
+
+## 0.14.2 (2026-02-06)
+
+### Bug fixes
+
+- Update hdf test data files to comply with newer pandas needs for units on datetime
+
+### Other changes
+
+- Update conda/meta.yaml and pyproject.toml to support conda-forge feedstock builds
+
+
 ## 0.14.1 (2025-12-17)
 
 ### Bug fixes
