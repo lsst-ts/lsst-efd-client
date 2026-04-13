@@ -243,7 +243,7 @@ async def test_parse_schema():
     client = MockRegistryApi(body=body)
 
     schema = await client.get_schema_by_subject("schema1")
-    result = EfdClientTools.parse_schema("schema1", schema)
+    result = EfdClientTools.parse_schema(schema)
     assert isinstance(result, pd.DataFrame)
     for i, name in enumerate("abcd"):
         assert result["name"][i] == name
@@ -288,7 +288,7 @@ async def test_bad_units():
 
     schema = await client.get_schema_by_subject("schema1")
     with pytest.raises(ValueError):
-        EfdClientTools.parse_schema("schema1", schema)
+        EfdClientTools.parse_schema(schema)
 
 
 @pytest.mark.asyncio
