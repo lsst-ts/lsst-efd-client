@@ -2,6 +2,41 @@
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-1.0.0'></a>
+## 1.0.0 (2026-04-14)
+
+### Backwards-incompatible changes
+
+- Remove unused `convert_influx_index` from `build_select_top_n_query`
+- Remove unused `topic` parameter from `parse_schema`
+
+### New features
+
+#### Authentication Changes
+- Add use of `lsst.rsp` for Repertoire service discovery and InfluxDB credential retrieval if it is available for authentication
+- Fall back on an `EFDAUTH` environment variable to find InfluxDB credentials when outside the RSP before attempting to use the Segwarides web service
+
+#### Influx Queries
+- Add `influxql_query` to send custom InfluxQL queries to the InfluxDB client
+- Add method to expose `_do_query` via `influxql_query` to send custom InfluxQL
+- Handle chunked queries through `influxql_query` and internal `_do_query`
+
+- Add `get_tags()` method to return the list of tag names for a topic.
+- Refresh EFD client documentation.
+
+### Bug fixes
+
+- Fix accessing `_db_name` in `EfdClientSync.build_time_range_query()`
+- Add `influx_client` property back with a deprecation warning to fix breaking change introduced in previous version
+- Pass specified parameters through in `select_top_n` and `build_select_top_n_query`
+
+- Default the client connection to port 443 if not specified
+- Update ruff configuration in pyproject.toml to match ts_pre_commit_config usage
+
+### Other changes
+
+- Update deprecation note for `influx_client` property
+
 <a id='changelog-0.14.2'></a>
 
 ## 0.14.2 (2026-02-06)
