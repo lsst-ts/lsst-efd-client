@@ -109,6 +109,7 @@ class EfdClientTools:
         creds_service="https://roundtable.lsst.codes/segwarides/",
         timeout=900,
         client=None,
+        output_mode="dataframe",
     ):
         auth = NotebookAuth(service_endpoint=creds_service)
         (
@@ -140,7 +141,7 @@ class EfdClientTools:
                 password=password,
                 db=db_name,
                 mode=mode.value,
-                output="dataframe",
+                output=output_mode,
                 timeout=timeout,
             )
         return schema_registry_url, client
@@ -397,6 +398,11 @@ class EfdClientSync(_EfdClientStatic):
         An instance of a class that ducktypes as
         `aioinflux.client.InfluxDBClient`. The intent is to be able to
         substitute a mocked client for testing.
+    output_mode : `str`, optional
+        The output mode to use for the InfluxDB client. This is passed directly
+        to the `aioinflux.client.InfluxDBClient` constructor. The default is
+        "dataframe" which returns query results as a `~pandas.DataFrame`.
+        "json" also supported.
     """
 
     mode = ClientMode.SYNC
@@ -408,6 +414,7 @@ class EfdClientSync(_EfdClientStatic):
         creds_service="https://roundtable.lsst.codes/segwarides/",
         timeout=900,
         client=None,
+        output_mode=None,
     ):
         (
             self._schema_registry_url,
@@ -419,6 +426,7 @@ class EfdClientSync(_EfdClientStatic):
             creds_service,
             timeout,
             client,
+            output_mode=output_mode,
         )
         self._db_name = db_name
         self._query_history = []
@@ -840,6 +848,11 @@ class EfdClient(_EfdClientStatic):
         An instance of a class that ducktypes as
         `aioinflux.client.InfluxDBClient`. The intent is to be able to
         substitute a mocked client for testing.
+    output_mode : `str`, optional
+        The output mode to use for the InfluxDB client. This is passed directly
+        to the `aioinflux.client.InfluxDBClient` constructor. The default is
+        "dataframe" which returns query results as a `~pandas.DataFrame`.
+        "json" also supported.
     """
 
     mode = ClientMode.ASYNC
@@ -851,11 +864,20 @@ class EfdClient(_EfdClientStatic):
         creds_service="https://roundtable.lsst.codes/segwarides/",
         timeout=900,
         client=None,
+        output_mode=None,
     ):
         (
             self._schema_registry_url,
             self._influx_client,
-        ) = EfdClientTools.get_client(efd_name, EfdClient.mode, db_name, creds_service, timeout, client)
+        ) = EfdClientTools.get_client(
+            efd_name,
+            EfdClient.mode,
+            db_name,
+            creds_service,
+            timeout,
+            client,
+            output_mode=output_mode,
+        )
         self._db_name = db_name
         self._query_history = []
 
