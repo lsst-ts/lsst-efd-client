@@ -43,6 +43,7 @@ test:
         - pytest-cov
         - pytest-asyncio
         - respx
+        - aiohttp <3.14.0
     source_files:
         - pyproject.toml
         - src
