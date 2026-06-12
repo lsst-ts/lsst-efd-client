@@ -126,7 +126,14 @@ class InfluxDBClient:
         :param loop: Asyncio event loop.
         :param kwargs: Additional kwargs for :class:`aiohttp.ClientSession`
         """
-        self._loop = loop or asyncio.get_event_loop()
+        if loop is not None:
+            self._loop = loop
+        else:
+            try:
+                self._loop = asyncio.get_event_loop()
+            except RuntimeError:
+                self._loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(self._loop)
         self._session: aiohttp.ClientSession = None
         self._mode = None
         self._output = None
