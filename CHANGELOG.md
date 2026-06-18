@@ -2,7 +2,16 @@
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-1.1.0'></a>
+
+## 1.1.0 (2026-06-18)
+
+### New features
+
+- Add output_mode to offer json or dataframe based influx output.
+
 <a id='changelog-1.0.0'></a>
+
 ## 1.0.0 (2026-04-14)
 
 ### Backwards-incompatible changes
