@@ -864,7 +864,7 @@ class EfdClient(_EfdClientStatic):
         creds_service="https://roundtable.lsst.codes/segwarides/",
         timeout=900,
         client=None,
-        output_mode=None,
+        output_mode="dataframe",
     ):
         (
             self._schema_registry_url,
