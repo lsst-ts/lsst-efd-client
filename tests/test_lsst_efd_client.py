@@ -143,6 +143,64 @@ def test_efd_names():
     assert set(list(EfdClient.list_efd_names())) == set(auth_client.list_auth())
 
 
+@pytest.mark.parametrize(
+    "client_class,expected_mode,expected_output_mode",
+    [
+        (EfdClient, "async", "dataframe"),
+        (EfdClientSync, "blocking", "dataframe"),
+    ],
+)
+def test_efd_client_constructor(monkeypatch, client_class, expected_mode, expected_output_mode):
+    influx_client = object()
+    get_client_args = {}
+
+    def mock_get_client(
+        efd_name,
+        mode,
+        db_name="efd",
+        creds_service="https://roundtable.lsst.codes/segwarides/",
+        timeout=900,
+        client=None,
+        output_mode="dataframe",
+    ):
+        get_client_args.update(
+            {
+                "efd_name": efd_name,
+                "mode": mode.value,
+                "db_name": db_name,
+                "creds_service": creds_service,
+                "timeout": timeout,
+                "client": client,
+                "output_mode": output_mode,
+            }
+        )
+        return "https://schema.example.invalid", influx_client
+
+    monkeypatch.setattr(EfdClientTools, "get_client", mock_get_client)
+
+    efd_client = client_class(
+        "test_efd",
+        db_name="constructor_test",
+        creds_service="https://credentials.example.invalid/",
+        timeout=42,
+        client=influx_client,
+    )
+
+    assert get_client_args == {
+        "efd_name": "test_efd",
+        "mode": expected_mode,
+        "db_name": "constructor_test",
+        "creds_service": "https://credentials.example.invalid/",
+        "timeout": 42,
+        "client": influx_client,
+        "output_mode": expected_output_mode,
+    }
+    assert efd_client._schema_registry_url == "https://schema.example.invalid"
+    assert efd_client._influx_client is influx_client
+    assert efd_client._db_name == "constructor_test"
+    assert efd_client.query_history == []
+
+
 @pytest.mark.asyncio
 @safe_vcr.use_cassette()
 async def test_build_query(start_stop):
