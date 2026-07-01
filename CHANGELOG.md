@@ -2,6 +2,13 @@
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-v1.1.1'></a>
+## v1.1.1 (2026-07-01)
+
+### Bug fixes
+
+- Fix async `EfdClient` initialization so it defaults to dataframe output instead of passing `None` for `output_mode`.
+
 <a id='changelog-1.1.0'></a>
 
 ## 1.1.0 (2026-06-18)
