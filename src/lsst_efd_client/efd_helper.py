@@ -431,6 +431,17 @@ class EfdClientSync(_EfdClientStatic):
         self._db_name = db_name
         self._query_history = []
 
+    def __aenter__(self):
+        return self
+
+    def __aexit__(self, exc_type, exc_val, exc_tb):
+        self.close()
+
+    def close(self):
+        """Close the underlying aioinflux client."""
+        if hasattr(self, "_influx_client") and self._influx_client:
+            self._influx_client.close()
+
     @property
     def influx_client(self):
         """Deprecated property"""
@@ -880,6 +891,17 @@ class EfdClient(_EfdClientStatic):
         )
         self._db_name = db_name
         self._query_history = []
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        await self.close()
+
+    async def close(self):
+        """Close the underlying aioinflux client."""
+        if hasattr(self, "_influx_client") and self._influx_client:
+            await self._influx_client.close()
 
     @property
     def influx_client(self):
