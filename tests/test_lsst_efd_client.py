@@ -42,7 +42,7 @@ from lsst_efd_client import (
     resample,
 )
 from lsst_efd_client.aioinflux import InfluxDBClient
-from lsst_efd_client.efd_helper import EfdClientTools
+from lsst_efd_client.efd_helper import ClientMode, EfdClientTools
 
 PATH = pathlib.Path(__file__).parent.absolute()
 
@@ -226,7 +226,7 @@ def test_efd_client_constructor(monkeypatch, client_class, expected_mode, expect
 @safe_vcr.use_cassette("test_get_auth.yaml")
 async def test_efd_client_closes_on_normal_context_exit():
     """Verify session is open inside context and closed upon normal exit."""
-    influx_client = InfluxDBClient(db="test", mode="async", output="dataframe")
+    influx_client = InfluxDBClient(db="test", mode=ClientMode.ASYNC.value, output="dataframe")
     await influx_client.create_session()
 
     async with EfdClient("test_efd", client=influx_client) as client:
@@ -240,7 +240,7 @@ async def test_efd_client_closes_on_normal_context_exit():
 @safe_vcr.use_cassette("test_get_auth.yaml")
 async def test_efd_client_closes_on_context_exception():
     """Verify session closes when an exception occurs inside the context."""
-    influx_client = InfluxDBClient(db="test", mode="async", output="dataframe")
+    influx_client = InfluxDBClient(db="test", mode=ClientMode.ASYNC.value, output="dataframe")
     await influx_client.create_session()
 
     with pytest.raises(RuntimeError, match="query failed"):
@@ -255,13 +255,65 @@ async def test_efd_client_closes_on_context_exception():
 @safe_vcr.use_cassette("test_get_auth.yaml")
 async def test_efd_client_explicit_close():
     """Verify explicit close() method shuts down the underlying session."""
-    influx_client = InfluxDBClient(db="test", mode="async", output="dataframe")
+    influx_client = InfluxDBClient(db="test", mode=ClientMode.ASYNC.value, output="dataframe")
     await influx_client.create_session()
     client = EfdClient("test_efd", client=influx_client)
     influx_session = client._influx_client._session
     assert not influx_session.closed
 
     await client.close()
+
+    assert influx_session.closed
+
+
+class FakeSession:
+    """Instead of aiohttp.ClientSession which would require a running loop"""
+
+    def __init__(self):
+        self.closed = False
+
+    async def close(self):
+        self.closed = True
+
+
+@safe_vcr.use_cassette("test_get_auth.yaml")
+def test_sync_efd_client_closes_on_normal_context_exit():
+    """Verify synchronous session is open inside and closed normally."""
+    influx_client = InfluxDBClient(db="test", mode=ClientMode.SYNC.value, output="dataframe")
+    influx_session = FakeSession()  # Create a synchronous session
+    influx_client._session = influx_session
+
+    with EfdClientSync("test_efd", client=influx_client):
+        assert not influx_session.closed
+
+    assert influx_session.closed
+
+
+@safe_vcr.use_cassette("test_get_auth.yaml")
+def test_sync_efd_client_closes_on_context_exception():
+    """Check synchronous session closes when an exp is inside the context."""
+    influx_client = InfluxDBClient(db="test", mode=ClientMode.SYNC.value, output="dataframe")
+    influx_session = FakeSession()  # Create a synchronous session
+    influx_client._session = influx_session
+
+    with pytest.raises(RuntimeError, match="query failed"):
+        with EfdClientSync("test_efd", client=influx_client):
+            raise RuntimeError("query failed")
+
+    assert influx_session.closed
+
+
+@safe_vcr.use_cassette("test_get_auth.yaml")
+def test_sync_efd_client_explicit_close():
+    """Verify explicit close() method shuts down synchronous fake session."""
+    influx_client = InfluxDBClient(db="test", mode=ClientMode.SYNC.value, output="dataframe")
+    influx_session = FakeSession()  # Create a synchronous session
+    influx_client._session = influx_session
+
+    client = EfdClientSync("test_efd", client=influx_client)
+    assert not influx_session.closed
+
+    client.close()
 
     assert influx_session.closed
 
