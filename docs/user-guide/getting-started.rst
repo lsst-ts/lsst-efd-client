@@ -36,5 +36,6 @@ To connect to the US Data Facility EFD use the database label ``usdf_efd``:
 This returns the list of available telemetry topics, confirming that the client is connected successfully.
 
 If you are running the EFD client outside the Rubin Science Platform, see the :ref:`authentication` guide for instructions on how to configure the connection to an EFD database instance.
+We would also suggest using the EFD client in an async context manager when running outside the RSP to ensure that the connection is closed properly.
 
 Check the guides section and the :ref:`py-api` for more information on how to use the EFD client.
