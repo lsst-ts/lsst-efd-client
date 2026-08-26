@@ -115,3 +115,4 @@ ENV/
 .isort.cfg
 .mypy.ini
 .ruff.toml
+.LICENSE.txt
