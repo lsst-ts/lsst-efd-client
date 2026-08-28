@@ -7,3 +7,4 @@ mypy: false
 check-yaml: true
 check-xml: true
 ruff: true
+insert-license: true

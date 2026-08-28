@@ -1,4 +1,17 @@
 repos:
+  - repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.5.6
+    hooks:
+      - id: insert-license
+        files: \.(py)
+        args:
+        - --license-filepath=.LICENSE.txt
+      - id: insert-license
+        files: (cpp)|(c)$
+        args:
+          - --license-filepath=.LICENSE.txt
+          - --comment-style="/*| *| */"
+      
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
@@ -7,7 +20,7 @@ repos:
       - id: check-xml
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.8
+    rev: v0.16.3
     hooks:
       # Run the linter.
       - id: ruff-check
