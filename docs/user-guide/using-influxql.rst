@@ -5,26 +5,28 @@ Using InfluxQL
 ##############
 
 This guide describes how to use the InfluxQL query language with the EFD client.
- 
+
 To execute InfluxQL queries you can use the ``influxql_query()`` method in conjunction with the EFD client.
 
 .. code::
 
    from lsst_efd_client import EfdClient
 
-   client = EfdClient("usdf_efd")
-   query = '''SELECT vacuum FROM "lsst.sal.ATCamera.vacuum" WHERE time > now() - 1h'''
-   await client.influxql_query(query)
+   async with EfdClient("usdf_efd") as client:
+       query = '''SELECT vacuum FROM "lsst.sal.ATCamera.vacuum" WHERE time > now() - 1h'''
+       data = await client.influxql_query(query)
 
-This query returns ``vaccum`` measurements for the ``ATCamera`` in the last hour. 
+This query returns ``vaccum`` measurements for the ``ATCamera`` in the last hour.
 It uses the the InfluxQL ``now()`` function to query a time range relative to the server's current time.
+
+In an RSP notebook, this may be done outside of a context manager. Outside the RSP, the context manager is preferred to ensure that the connection is closed properly.
 
 See `InfluxQL time syntax`_ documentation for detailed information on how to specify time ranges in InfluxQL queries.
 
 The EFD client helper function ``build_time_range_query()`` can also be used to build InfluxQL queries for a topic and time range, which can then be executed with the ``influxql_query()`` method.
 
 .. note::
-   
+
    InfluxQL queries are also used in the Chronograf UI, so using InfluxQL queries with the EFD client can be helpful when exploring data in both contexts.
 
 In the following notebooks, you can find more examples using InfluxQL such as downsampling data with ``GROUP by time()``, using aggregation functions, and chunked queries for efficient retrieval of large datasets:

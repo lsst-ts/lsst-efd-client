@@ -9,21 +9,21 @@ This guide describes how authentication for the EFD client works both inside and
 .. note::
 
     The EFD client is migrating to use the RSP Repertoire service discovery.
-    The current authentication method with Segwarides will be deprecated in the future. 
-    
+    The current authentication method with Segwarides will be deprecated in the future.
+
     When running the EFD client outside the RSP, you should use the new Repertoire-based authentication method described below.
-    
+
 Authentication inside the RSP
 =============================
 
-When running the EFD client inside the RSP, authentication is handled automatically by `Repertoire`_ service discovery. 
+When running the EFD client inside the RSP, authentication is handled automatically by `Repertoire`_ service discovery.
 
 To list the available EFD databases in your RSP environment:
 
 .. code::
 
     from lsst.rsp import list_influxdb_labels
-    
+
     list_influxdb_labels()
 
 This returns a list of database labels that can be used to initialize the EFD client:
@@ -33,6 +33,15 @@ This returns a list of database labels that can be used to initialize the EFD cl
     from lsst_efd_client import EfdClient
 
     client = EfdClient("<database_label>")
+
+Or use the client in a context manager:
+
+.. code::
+
+    from lsst_efd_client import EfdClient
+
+    async with EfdClient("<database_label>") as client:
+        await client.get_topics()
 
 
 Authentication outside the RSP
