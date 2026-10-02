@@ -2,7 +2,20 @@
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-v1.1.2'></a>
+
+## v1.1.2 (2026-10-02)
+
+### Bug fixes
+
+- Implemented context manager pattern with close function to EfdClient and EfdClientSync
+
+### Other changes
+
+- Add `local_scheme="no-local-version"` to `setup.py` to strip git hash from version string so Nexus can accept a development version.
+
 <a id='changelog-v1.1.1'></a>
+
 ## v1.1.1 (2026-07-01)
 
 ### Bug fixes
@@ -66,6 +79,8 @@
 - Update conda/meta.yaml and pyproject.toml to support conda-forge feedstock builds
 
 
+<a id='changelog-0.14.1'></a>
+
 ## 0.14.1 (2025-12-17)
 
 ### Bug fixes
@@ -75,6 +90,8 @@
 ### Other changes
 
 - Remove older unused github actions in favor of Jenkins builds
+
+<a id='changelog-0.14.0'></a>
 
 ## 0.14.0 (2025-12-12)
 
@@ -89,6 +106,8 @@
 - Update documentation to use the Rubin user guide theme from Documenteer.
 - Add GitHub Actions for continuous integration.
 - Add tox for test orchestration.
+
+<a id='changelog-0.13.2'></a>
 
 ## 0.13.2 (2025-10-06)
 
